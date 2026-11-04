@@ -1,169 +1,159 @@
-# Facilitator guide
+# Facilitator guide - One maintenance story
 
 ## Session contract
 
-Audience: intermediate engineers new to GitHub Copilot. Follow the
-[participant narrative](../docs/README.md): one inherited React app, one
-inspector-lead story, and continuous improvement through Modules 0-5.
-Use synthetic data only. Scoring is not official CFIA policy.
+Participants inherit the React tracker, investigate whitespace-only facility
+names, implement one bounded fix, review it, and establish test evidence.
+Use synthetic data; scoring is not official CFIA policy.
 
-**Copilot proposes; you review; checks provide evidence.**
+**Copilot proposes; humans approve; checks provide evidence.**
 
-| Module | Timebox | Transition |
+| Module | Suggested duration | Transition/checkpoint |
 | --- | --- | --- |
-| 0 | 15 min | Observe the baseline and explain actual code. |
-| 1 | 15 min | Agree on measurable rules before coding. |
-| 2 | 35 min | Improve one form/service workflow, not a rewrite. |
-| 3 | 25 min | Reproduce and address distinct review findings. |
-| 4 | 20 min | Extend existing tests against independent oracles. |
-| 5 | 10 min | Capture reusable patterns and honest evidence. |
+| 0 | 15 min, separate | Existing prerequisites; do not rewrite this guide. |
+| 1 | 15 min | Interactive explanation verified against source. |
+| 2 | 35 min | Interactive -> Plan -> regression failure -> bounded Autopilot fix -> human verification. |
+| 3 | 25 min | Dedicated code review plus specialist security/accessibility review decisions. |
+| 4 | 35 min | Unit/service, integration, browser E2E, scoped accessibility evidence. |
+| 5 | 10 min | Handoff and reusable prompting/verification habits. |
 
-Core total: two hours. There is no backend or optional CI/deployment track.
+Modules 1-5 total **120 minutes**. Including the separate 15-minute prerequisite
+module gives **135 minutes**. Durations are suggested, not execution guarantees.
+Protect checkpoints rather than rushing through unverified output.
 
-## Before participants arrive
+## Prepare before participants arrive
 
-- Verify VS Code, authorized Copilot access, Node.js 22.12+, PowerShell, and npm
-  access. Recommend Node.js 24 LTS. Account/tool provisioning is pre-work.
-- Run [quick setup](../README.md#quick-setup), tests, build, and the browser flow
-  on the actual classroom network. Only port 5173 is needed.
-- Baseline test count is **20** across scoring, local service, and App tests.
-  Participant additions change the count; assertions matter more than totals.
-- Use a separate rehearsal copy to complete Modules 1-4. Prepare small reviewed
-  rescue diffs for normalization, field feedback, unknown-field rejection,
-  failed-load presentation, and Unicode tests. Do not solve the distributed starter.
-- Prepare verified recovery checkpoints yourself; they are not supplied reference
-  solutions. Never overwrite participant work as a rescue.
-- Use a fresh browser profile or confirmed reset before demonstrating. Existing
-  localStorage survives Vite restarts. Keep the address `127.0.0.1:5173` consistent.
-- Prepare an approved package cache/feed if needed. The test tools are already
-  in the manifest/lockfile; participants should not install another runner.
-- Keep saved synthetic prompt responses and check output for outage fallback.
-  Label them as recorded examples rather than live results.
+- Verify quick setup, Copilot access, Node.js, npm feeds, and the classroom network.
+- Use the **Copilot** harness/session target and verify its Agent mode picker
+  has **Interactive, Plan, and Autopilot**. Rehearse exact UI labels.
+  Module 0 intentionally retains older wording; point to Module 1 for current
+  controls rather than editing prerequisites.
+- Explain separately selected permissions. Never require unrestricted access.
+- Confirm the intentionally unfixed starter accepts whitespace-only facility names.
+- Run existing tests and build. Verify assertions, not a target test count.
+- Rehearse Modules 1-4 in a separate working copy. Do not solve the distributed
+  starter. Prepare reviewed recovery notes/checkpoints yourself; no reference
+  application solution or automated rescue patch is supplied.
+- Keep each module's required headings and one-prompt-at-a-time rhythm.
 
-## Architecture talk track
+## Browser-test preparation
 
-One React + TypeScript app calls an asynchronous
-[findings service](../client/src/findings.ts). On absent storage it loads a
-[bundled synthetic example](../client/src/seed-findings.json), then persists
-records in `cfia-workshop.findings.v1`. The [risk function](../client/src/risk.ts)
-maps severity to exact score/action pairs.
+After dependency installation, from repository root:
 
-There are no HTTP endpoints, credentials, database migrations, or cross-service
-startup dependencies. The Vite process serves the UI, not an inspection API.
-Promises retain meaningful load/save/error behavior without artificial latency.
+```powershell
+Push-Location .\client
+npx.cmd playwright install chromium
+Pop-Location
+npm.cmd --prefix .\client run test:e2e
+npm.cmd --prefix .\client run test:a11y
+npm.cmd --prefix .\client run build
+```
 
-Browser storage is not a trusted security boundary. Users can edit records,
-scores, and code. Shape checking catches malformed data but does not establish
-authenticity. Keep reliability hardening separate from production assurances.
+Prepare browser downloads using the approved organizational network/cache.
+Do not weaken security policy or let participants install tooling during the
+testing module. If Chromium cannot be provisioned, resolve before delivery;
+a manual browser check is not equivalent to the core automated E2E checkpoint.
 
-## Room pacing and recovery
+Playwright owns a Vite server on **127.0.0.1:5174**, refuses unknown existing
+servers, and stops its managed server afterward. The manual app remains on
+**5173**. Each browser test gets a fresh context. Vitest excludes the E2E folder,
+and build/typecheck includes browser-test/config types.
 
-Use three states: **green** (checkpoint demonstrated), **amber** (specific failing
-check), **red** (unable to run tools). Ask for step + command + observed result,
-not "Copilot is broken." Pair a driver and navigator; switch roles each module.
+The supplied two browser cases establish existing valid save/reload/reset
+behavior and an initial-page axe scan. Bug-specific tests are participant work,
+not failing tests shipped in the starter. Module 4 adds invalid/corrected states.
+The accessibility command matches test paths containing `accessibility`; keep
+new cases in `accessibility.spec.ts` or `*.accessibility.spec.ts`.
 
-For blockers, inspect directory/runtime/exact error, make one bounded correction,
-and rerun the same check. If still blocked, pair the learner or use a reviewed
-rescue diff. Preserve their original work. Never count unexecuted checks as passes.
-Protect Module 5; shorten optional elaboration, not the evidence requirements.
+Reports are local ignored outputs. `test:e2e:report` starts a viewer; stop it with
+Ctrl+C. Inspect axe JSON and retained failure traces rather than guessing causes.
 
-## Module 0 - Setup and orientation
+## Customization preparation
 
-**Success:** one app runs; 20 baseline tests and build pass; a high finding
-shows **80 / Prioritize immediate review**; reload retains it; cancel reset
-preserves it and confirmed reset restores the example.
+Read [agents and prompts](../.github/workshop-customizations.md).
 
-Keep the user's orientation workflow: run the app, then one Ask-mode prompt to
-explain it. No starter edits yet.
+1. Verify the supplied files remain unchanged from the approved originals.
+2. Verify workspace discovery in the actual agent/prompt pickers. Both `.md`
+   agent definitions are supported by the current reference; do not assume that
+   valid filenames guarantee model/tool compatibility.
+3. Check **Claude Sonnet 4** availability and supported tool identifiers. Rehearse
+   the real invocation, not only file inspection.
+4. Preview mandatory report/plan writes. The supplied accessibility agent is
+   not read-only; it names more than one plan/output location.
+5. Explain the standard-agent fallback when a model/tool is unavailable. Label
+   the fallback honestly; do not claim a specialist ran.
+6. Preserve the WCAG 2.1 baseline labels on the originals. The workshop companion
+   targets scoped WCAG 2.2 AA checks, including applicable additions.
+7. Discuss the supplied prompt's incorrect blanket empty-alt assertion and its
+   Perceivable-only final execution. Do not run that recipe verbatim as the core.
 
-**Likely blockers and recovery**
+Model/picker/tool behavior requires live verification in the delivery environment.
+Repository tests cannot validate those UI/account-dependent prerequisites.
 
-- `npm.ps1` policy: use `npm.cmd`; do not weaken machine-wide policy.
-- Wrong directory: use root `--prefix .\client` commands.
-- Occupied port: identify the owner; do not kill unrelated processes.
-- Different records: confirm origin/profile; `localhost` and `127.0.0.1` differ.
-- Corrupt synthetic storage: inspect the visible error, then explicitly reset.
+## Facilitation by module
 
-**Debrief:** where is scoring computed, what initializes seeds, what survives a
-restart, and which Copilot claim did you compare with source?
+### Module 1 - Understand
 
-## Module 1 - Requirements
+Have learners verify a source reference rather than merely read a fluent answer.
+Use a small existing-architecture diagram in chat. Do not turn this into document
+generation or a backend redesign.
 
-**Success:** [requirements.md](../requirements.md) contains F/V/NF IDs, exact
-20/50/80 rules, 40/120/60/1000 limits, type/unknown-key rules, code-point
-boundaries, persistence/reset behavior, and a definition of done.
+### Module 2 - Fix
 
-Model one criterion: whitespace-only facility input rejects, identifies the
-field, and leaves storage unchanged. Clarify that normalization/limits and strict
-extra-key rejection are planned, not current protections.
+Give everyone the same bug report. Check reproduction before discussing a fix.
+Only the whitespace-only rejection remains for participants to implement.
+Normalization, validation before storage, typed/associated field feedback,
+failed-input retention, and retry are already supplied. The existing empty check
+uses the raw name; participants make it check the trimmed name.
 
-**Watch for:** invented CFIA policy, runtime validation assumed from TS types,
-requirements copied only from starter behavior, and production security claims.
+Pause after plan review and again after the expected regression failure.
+An import/syntax failure is not proof of the bug. Autopilot implements only the
+approved correction; inspect the diff and retry workflow afterward.
+Keep unrelated full-field limits, unknown-key rejection, and load-state fixes out.
 
-## Module 2 - Implementation
+### Module 3 - Review
 
-**Success:** a normalized finding saves through the form/service, returns the
-exact score/action, and survives reload. Invalid text leaves storage unchanged,
-retains entered values, and provides usable field feedback.
+Review the actual change and necessary callers. Distinguish the dedicated local
+review action from a chat review fallback. Use accept/modify/reject/investigate.
+Do not require a fixed number of vulnerabilities or an extra unrelated repair.
+No confirmed actionable finding is a valid result.
 
-Keep validation before any storage write and reuse shared rules. Explain why
-`Array.from(text).length` differs from `.length` for emoji. Keep scoring pure and
-leave unknown-field hardening for Module 3.
+Review security in the browser-only context; ignored fields do not demonstrate
+successful score override. Review accessibility across initial/error/corrected
+states and separate automated evidence from manual evaluation.
+GitHub PR review is not required and is not the same surface as custom agents.
 
-Prepare a normalization-test rescue diff. Reject unrelated libraries, new
-backend infrastructure, silent catches, or test assertions weakened to match bugs.
+### Module 4 - Test
 
-**Debrief:** what did the new regression prove, and what remains unverified?
+Expand missing evidence rather than duplicate Module 2 regressions. Use literal
+expected score/action outputs and complete storage comparisons.
+Run real-browser invalid -> correction -> save -> reload and reset preservation.
+No fixed sleeps or network mocks are needed. Reuse the preconfigured browser runner.
+Use axe/DOM assertions plus manual keyboard checks, and state what remains unverified.
 
-## Module 3 - Security and review
+### Module 5 - Reflect
 
-**Success:** one input-handling issue and one distinct code-quality issue have
-reproduction, fix, and regression evidence.
+Require actual evidence in the handoff. Keep three reusable prompts, three traps,
+and one next-project application concrete. Do not generate imaginary successes.
 
-Default targets:
+## Recovery
 
-1. Extra create-input keys are ignored: high severity still produces 80. The
-   desired strict contract rejects extras without appending. Do not describe
-   ignored `risk_score: 1` as a successful override exploit.
-2. Load failure can coexist with a successful-looking empty/stale list. Separate
-   error/empty states and provide honest retry/reset feedback.
+Ask for **step, exact command, actual output**. Keep learner changes.
+For a failing test, inspect the smallest relevant evidence, fix the root cause,
+and rerun that check without weakening its assertion.
+For port conflicts, identify ownership; never kill processes by name.
+For unavailable Copilot features, use an explicitly labelled supported fallback.
+If browser automation is blocked, record the missing core checkpoint and resolve
+the prerequisite rather than claiming completion.
 
-Have learners inspect literal markup rendering and DevTools score tampering.
-The first should already be safe React text behavior; the second demonstrates
-the browser-only trust limitation, not an invitation to add browser secrets.
+## Reference material
 
-Do not silently recover corrupt storage with `[]` or clear unrelated keys.
-Do not manufacture two findings from one issue. If a target was already fixed,
-select another concrete defect in current feedback/validation behavior.
+The task rhythm was informed by the supplied
+[modernization lab](https://github.com/aj-enns/copilot-modernize-review-test/blob/main/labs/01-modernize.md)
+and [review lab](https://github.com/aj-enns/copilot-modernize-review-test/blob/main/labs/02-review.md).
+The tracker instructions and prompts are original to this maintenance story.
 
-## Module 4 - Tests and confidence
-
-**Success:** extended scoring, service, and App tests pass with a new edge case.
-Require explicit output assertions and full unchanged-state checks.
-
-Default new edge: trimmed 1000 emoji notes accepted; 1001 rejected. Use
-`"\u{1F642}".repeat(1000)` so code-point and UTF-16 counts differ.
-
-Keep real App/form/service integration in jsdom; do not stub the only behavior
-under test. Inject storage failures only in the relevant cases. Restore spies,
-clean the DOM, and isolate localStorage between tests.
-
-**Debrief:** which checks are component evidence, which were observed in a real
-browser, and what does a green build alone fail to establish?
-
-## Module 5 - Retrospective
-
-**Success:** [prompt playbook](../prompts/prompt-playbook.md) has three patterns,
-three traps/mitigations, actual tracker evidence, and a next-project application
-for each pattern. Label anticipated traps and unverified claims honestly.
-
-Stop the single app process with Ctrl+C. Do not erase participant evidence.
-
-## Fast-finish extensions
-
-- Add a regression for internal newline preservation or accessible field feedback.
-- Explain the difference between stored-shape validity and semantic consistency.
-- Verify failed reset preserves both displayed and persisted records.
-
-Keep authentication, shared records, CI/deployment, new scoring policy, and
-unrequested features out of the core workshop.
+- [Current Copilot planning workflow](https://code.visualstudio.com/docs/agents/run/planning)
+- [Agent harness differences](https://code.visualstudio.com/docs/agents/run/agent-harnesses)
+- [Custom-agent locations and compatibility](https://code.visualstudio.com/docs/agents/reference/custom-agent-file-reference)
+- [WCAG versions and conformance](https://www.w3.org/WAI/standards-guidelines/wcag/)

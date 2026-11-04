@@ -7,6 +7,8 @@ import type { FindingCreate } from "./findings";
 interface Props {
   disabled: boolean;
   saving: boolean;
+  facilityError: string;
+  onFacilityChange: () => void;
   onSubmit: (finding: FindingCreate) => Promise<boolean>;
 }
 
@@ -18,7 +20,7 @@ const initialFinding: FindingCreate = {
   notes: "",
 };
 
-export default function FindingForm({ disabled, saving, onSubmit }: Props) {
+export default function FindingForm({ disabled, saving, facilityError, onFacilityChange, onSubmit }: Props) {
   const [finding, setFinding] = useState<FindingCreate>(initialFinding);
 
   function update<K extends keyof FindingCreate>(field: K, value: FindingCreate[K]) {
@@ -38,7 +40,6 @@ export default function FindingForm({ disabled, saving, onSubmit }: Props) {
       <h2>Log a finding</h2>
       <fieldset disabled={disabled}>
         <legend>Finding details</legend>
-        {/* TODO workshop hardening: required alone accepts whitespace and has no length limits. */}
         <label>
           Inspector ID
           <input required value={finding.inspector_id}
@@ -47,8 +48,14 @@ export default function FindingForm({ disabled, saving, onSubmit }: Props) {
         <label>
           Facility name
           <input required value={finding.facility_name}
-            onChange={(event) => update("facility_name", event.target.value)} />
+            aria-invalid={facilityError ? true : undefined}
+            aria-describedby={facilityError ? "facility-error" : undefined}
+            onChange={(event) => {
+              update("facility_name", event.target.value);
+              onFacilityChange();
+            }} />
         </label>
+        {facilityError && <p id="facility-error" role="alert" className="error">{facilityError}</p>}
         <label>
           Inspection type
           <input required value={finding.inspection_type}

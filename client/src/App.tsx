@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { createFinding, getFindings, resetFindings } from "./findings";
+import { createFinding, FacilityNameError, getFindings, resetFindings } from "./findings";
 import type { Finding, FindingCreate } from "./findings";
 import FindingForm from "./FindingForm";
 
@@ -14,6 +14,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [facilityError, setFacilityError] = useState("");
   const [refresh, setRefresh] = useState(0);
 
   useEffect(() => {
@@ -40,13 +41,19 @@ export default function App() {
   async function save(payload: FindingCreate): Promise<boolean> {
     setSaving(true);
     setError("");
+    setFacilityError("");
+    setLatest(null);
     try {
       const created = await createFinding(payload);
       setFindings((current) => [...current, created]);
       setLatest(created);
       return true;
     } catch (cause: unknown) {
-      setError(`Could not save finding: ${errorMessage(cause)}`);
+      if (cause instanceof FacilityNameError) {
+        setFacilityError(cause.message);
+      } else {
+        setError(`Could not save finding: ${errorMessage(cause)}`);
+      }
       return false;
     } finally {
       setSaving(false);
@@ -75,7 +82,9 @@ export default function App() {
       <p>Findings stay in this browser on this address. Reset demo data restores the synthetic example.</p>
       <button disabled={loading || saving} onClick={reset}>Reset demo data</button>
       {error && <p role="alert" className="error">{error}</p>}
-      <FindingForm disabled={loading || saving} saving={saving} onSubmit={save} />
+      <FindingForm disabled={loading || saving} saving={saving}
+        facilityError={facilityError} onFacilityChange={() => setFacilityError("")}
+        onSubmit={save} />
 
       {latest && (
         <section aria-label="Latest saved finding" role="status" className="result">

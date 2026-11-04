@@ -40,6 +40,19 @@ function isFinding(value: unknown): value is Finding {
 
 export const STORAGE_KEY = "cfia-workshop.findings.v1";
 
+export class FacilityNameError extends Error {
+  constructor() {
+    super("Enter a facility name.");
+    this.name = "FacilityNameError";
+  }
+}
+
+function normalizeFacilityName(value: string): string {
+  // Module 2: this check still accepts whitespace-only names.
+  if (value.length === 0) throw new FacilityNameError();
+  return value.trim();
+}
+
 function parseFindings(data: unknown): Finding[] {
   if (!Array.isArray(data) || !data.every(isFinding)) {
     throw new Error("Saved findings have an invalid format. Use Reset demo data to recover.");
@@ -81,10 +94,11 @@ export async function createFinding(payload: FindingCreate): Promise<Finding> {
   if (!isFindingCreate(payload)) {
     throw new Error("A finding requires five text fields and a low, medium, or high severity.");
   }
-  // TODO workshop hardening: trim/limit text, reject unknown fields, and return field errors.
   const { inspector_id, facility_name, inspection_type, severity, notes } = payload;
   const finding: Finding = {
-    inspector_id, facility_name, inspection_type, severity, notes,
+    inspector_id,
+    facility_name: normalizeFacilityName(facility_name),
+    inspection_type, severity, notes,
     ...calculateRisk(severity),
   };
   const findings = await getFindings();

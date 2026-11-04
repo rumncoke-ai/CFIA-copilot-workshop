@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { createFinding, getFindings, resetFindings, STORAGE_KEY } from "./findings";
+import { createFinding, FacilityNameError, getFindings, resetFindings, STORAGE_KEY } from "./findings";
 import type { FindingCreate } from "./findings";
 import seeds from "./seed-findings.json";
 
@@ -21,6 +21,41 @@ beforeEach(() => localStorage.clear());
 afterEach(() => vi.restoreAllMocks());
 
 describe("local findings baseline", () => {
+  it.each([
+    ["  Demo Facility  ", "Demo Facility"],
+    ["  Demo  Facility  ", "Demo  Facility"],
+    ["  \u{1F642}  ", "\u{1F642}"],
+  ])("normalizes facility %j without changing other fields", async (facility_name, normalized) => {
+    const input = {
+      ...payload, facility_name, inspector_id: " INS-001 ",
+      inspection_type: " Routine ", notes: " Notes ",
+    };
+    const result = {
+      ...input, facility_name: normalized,
+      risk_score: 80, follow_up_action: "Prioritize immediate review",
+    };
+    expect(await createFinding(input)).toEqual(result);
+    expect(await getFindings()).toEqual([...seeds, result]);
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toEqual([...seeds, result]);
+  });
+
+  it.each([false, true])("rejects an empty facility before storage access (initialized: %s)", async (initialized) => {
+    if (initialized) await getFindings();
+    const before = localStorage.getItem(STORAGE_KEY);
+    const read = vi.spyOn(Storage.prototype, "getItem");
+    const write = vi.spyOn(Storage.prototype, "setItem");
+    await expect(createFinding({ ...payload, facility_name: "" })).rejects.toBeInstanceOf(FacilityNameError);
+    expect(read).not.toHaveBeenCalled();
+    expect(write).not.toHaveBeenCalled();
+    expect(localStorage.getItem(STORAGE_KEY)).toBe(before);
+  });
+
+  it.each([null, undefined, 42])("preserves runtime rejection of a non-string facility: %s", async (facility_name) => {
+    // @ts-expect-error Exercise invalid runtime input from an untyped caller.
+    await expect(createFinding({ ...payload, facility_name })).rejects.toThrow("A finding requires");
+    expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+  });
+
   it("initializes absent storage from seeds and persists them", async () => {
     expect(await getFindings()).toEqual(seeds);
     expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toEqual(seeds);

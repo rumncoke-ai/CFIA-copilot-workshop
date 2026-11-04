@@ -1,158 +1,151 @@
-# Module 2 - Feature implementation
+# Module 2 - Fix the bug from start to finish
 
 ## 1. Objective
 
-**Timebox: 35 minutes.** Implement the reviewed text-validation criteria in the
-existing form and local data service. Deliver one slice: save a normalized,
-valid finding and show its calculated score/action.
+**Suggested duration: 35 minutes.**
 
-The starter already creates/lists findings and persists them. Do not rebuild it
-or add a backend, HTTP mocking layer, database, or UI framework.
+In this module, we'll explore a reported bug and use Copilot to understand why
+it happens. We'll plan a fix, add a test that catches the problem, and then make
+the change. Finally, we'll try the updated app and run the tests to check that
+the fix works. You'll finish with a working fix and a test to help catch the
+same bug if it returns.
 
-## 2. Why this matters
+> An inspector lead reports that a facility name containing only spaces can be
+> saved. It produces a finding without a usable facility name.
 
-The inspector lead experiences one workflow, not isolated functions. A service
-that accepts whitespace while the form rejects it produces inconsistent
-behavior. Small, reviewed producer/consumer changes keep the contract visible.
+## 2. Why it matters
 
-Use **explain -> review -> apply -> verify**. Copilot's explanation is a proposal,
-not evidence that the implementation is correct.
+A real maintenance change needs a reproduction, an independent expected outcome,
+a reviewed plan, and verification. Copilot helps at each step; it does not decide
+inspection policy or approve its own changes.
 
 ## 3. Tasks
 
-Keep the app terminal running. Open a second PowerShell terminal at the
-repository root for checks.
+### A. Reproduce and understand
 
-### A. Bound the change
+1. Confirm **Interactive** in the Copilot Agent mode picker.
+2. In the browser, enter synthetic values for all fields, but enter three spaces
+   for **Facility name**. Select **High**, then **Save finding**.
+3. Observe the saved result/list and browser storage. The starter trims the
+   spaces to an empty name but still saves it; do not claim it rejected the input.
+4. Attach these files to Chat (paths start at the repository root):
+   - [client/src/FindingForm.tsx](../client/src/FindingForm.tsx)
+   - [client/src/App.tsx](../client/src/App.tsx)
+   - [client/src/findings.ts](../client/src/findings.ts)
 
-Attach [requirements.md](../requirements.md), [findings.ts](../client/src/findings.ts),
-[FindingForm.tsx](../client/src/FindingForm.tsx), and
-[App.tsx](../client/src/App.tsx).
-
-| Implement now | Preserve / defer |
-| --- | --- |
-| Required strings, trimming, post-trim code-point limits, exact severity. | Existing 20/50/80 score/action mapping and input/output field names. |
-| Field-specific local feedback and matching service validation. | Seeds, persistence, confirmed reset, order, and duplicates. |
-| One focused normalization regression and manual failure check. | Module 3: unknown-field rejection and error/empty-state review. Module 4: full boundary matrix. |
-
-Do not claim the entire definition of done is complete after this slice.
-
-### B. Improve validation in the service
-
-Ask Copilot to propose a small validation helper used by `createFinding`.
-It must check runtime values before reading or normalizing their contents:
-
-1. Require each input field to be a string; reject missing/`null`/numeric fields.
-2. Trim only the four free-text fields before checking their limits:
-   **40 / 120 / 60 / 1000**, minimum **1**.
-3. Use code-point counting such as `Array.from(text).length`; JavaScript
-   `.length` and native `maxLength` count UTF-16 units, not code points.
-4. Preserve internal whitespace, line breaks, and Unicode text.
-5. Keep severity exactly `low | medium | high`, without normalization.
-6. Validate before initialization/appending/writing, so rejected input does not
-   change storage, even if the app key was absent.
-7. Keep scoring in [risk.ts](../client/src/risk.ts), not in the form or payload.
-8. Provide field-identifying validation errors that callers can handle safely.
-   Avoid unchecked casts, `any`, silent returns, or generic success fallbacks.
-
-Reuse shared validation rules for the service and form rather than duplicating
-length limits in unrelated places. A small typed field-error structure is enough;
-do not introduce a general validation framework.
-
-Add a regression to [findings.test.ts](../client/src/findings.test.ts):
-save a high finding with outer spaces in all text fields, then assert the
-complete normalized result and full read-back list. Use literal expected
-score/action values, not the production scoring table.
-
-```powershell
-npm.cmd --prefix .\client test -- src\findings.test.ts
-```
-
-Inspect the diff and actual result before accepting the change. Remove only
-TODO text whose behavior is now implemented.
-
-### C. Connect form feedback
-
-Use the reviewed helper/error shape to show field errors near their controls.
-Associate messages using `aria-describedby` and mark invalid controls with
-`aria-invalid`. Keep general storage failures in the app's visible alert.
-
-Preserve:
-
-- Input values after any failed save.
-- Disabled controls during saving and usable controls afterward.
-- Form clearing only after persistence succeeds.
-- Success confirmation, list updates, refresh, and confirmed reset.
-- React text rendering; do not use `dangerouslySetInnerHTML`.
-
-The form may show immediate validation feedback, but the service must still
-validate callers that bypass the form. Browser checks improve consistency;
-they do not prevent a user from changing their own data/code.
-
-### D. Verify the complete slice
-
-```powershell
-npm.cmd --prefix .\client test
-npm.cmd --prefix .\client run build
-```
-
-In the browser:
-
-1. Save a high-severity finding with outer spaces. Expect normalized text,
-   score **80**, exact action **Prioritize immediate review**, and a cleared form.
-2. Reload the browser. The normalized finding remains for the same origin.
-3. Submit whitespace-only facility text. Expect a field error, retained inputs,
-   no success confirmation for that attempt, and no new finding.
-4. Save corrected input. Expect normal behavior without restarting the app.
-
-Also test the service directly in a regression test with whitespace-only text.
-Native form `required` alone cannot establish service validation.
-
-Record the criterion IDs, commands, observed outcomes, and remaining gaps in
-[requirements.md](../requirements.md). A passing suite is evidence for its
-cases, not proof of all untested criteria.
-
-## 4. VS Code + Copilot prompts
-
-**Explain the bounded slice:**
+   Then paste:
 
 ```text
-Do not edit yet. Inspect the attached code and reviewed V-01 through V-05.
-Propose the smallest form/service changes, shared validation/error shape,
-and a normalization regression test. Preserve scoring, seeds, persistence,
-duplicates, refresh, and reset. Leave unknown-field hardening for Module 3.
-Return file/function, change, reason, and verification. Wait for approval.
+Do not edit. Bug: a facility name containing three spaces saves successfully.
+Trace this exact submission through the form, App, and local service.
+Explain the root cause with file/function references. Distinguish native
+required validation from whitespace validation and service validation.
+Propose no unrelated fixes. Explain why a whitespace-only name should be rejected
+and identify the safeguards already supplied.
 ```
 
-**Apply after review:**
+5. Review the expected behavior above. The only fix is rejecting whitespace-only
+   facility names. Normalization, storage safeguards, failed-save retention, and
+   accessible feedback are already supplied. Preserve internal spaces and Unicode,
+   other fields, scoring, duplicates, seed data, persistence, and confirmed reset.
+
+### B. Propose the fix
+
+1. Select **Plan** in the Agent mode picker.
+2. Attach these files to Chat (paths start at the repository root):
+   - [client/src/FindingForm.tsx](../client/src/FindingForm.tsx)
+   - [client/src/App.tsx](../client/src/App.tsx)
+   - [client/src/findings.ts](../client/src/findings.ts)
+   - [client/src/findings.test.ts](../client/src/findings.test.ts)
+   - [client/src/App.test.tsx](../client/src/App.test.tsx)
+
+   Then paste:
 
 ```text
-Apply only the changes I approved in the named files. Validate runtime types,
-trim before code-point length checks, and validate before any storage write.
-Use safe field-error narrowing. Add the reviewed normalization test with
-explicit expected values. Report actual checks and unresolved criteria.
+Plan the smallest fix for whitespace-only facility names. Do not edit application
+code yet. Reject them before any storage access, including direct service calls.
+Find the existing facility empty check and explain why spaces pass it.
+Reuse normalization, typed errors, accessible feedback, and storage safeguards.
+Preserve all existing behavior except accepting whitespace-only names.
+Do not add features, validation frameworks, or unrelated fixes.
+Specify an expected failing regression and exact verification commands.
+Stop for human review.
 ```
 
-**Repair a failure:**
+3. Inspect the proposed plan. Reject unrelated changes and unchecked casts.
+4. Approve the plan **without starting implementation**, when that action is
+   offered. Switch to **Interactive** for the test-first step. If labels differ,
+   use the available plan-review controls to finish review without authorizing
+   the full implementation yet.
+
+### C. Establish the regression
+
+We're not fixing the code just yet. First, we'll add a test that catches the bug
+and watch it fail. This shows that the test can spot the problem before we fix it.
+
+A **regression** is when a bug comes back or a change breaks something that used
+to work. A **regression test** helps catch that. Our test should fail now, pass
+after the fix, and warn us if a future change brings this bug back.
+
+1. Paste this bounded prompt:
 
 ```text
-Here are the exact failing command and output: [PASTE].
-Explain the root cause against [CRITERION_ID] before editing.
-Fix only the related defect; do not weaken assertions, change the contract,
-rewrite the app, or suppress the error. Rerun the same check.
+Implement only the planned service regression for whitespace-only facility_name
+in client/src/findings.test.ts. Do not fix implementation yet.
+Use valid values for every other field. Initialize storage, capture its complete
+serialized value, expect rejection identifying facility, and assert unchanged
+storage. The expected behavior is rejection before any storage access, not
+acceptance just because the current code allows it.
+Run npm.cmd --prefix .\client test -- src\findings.test.ts from repository root.
+Stop after showing the failure and explain how it demonstrates the reported bug.
 ```
 
-## 5. Checkpoint and retrospective
+2. Inspect the test and actual output. The failure must show acceptance where
+   rejection was expected, not a syntax error or missing dependency.
+3. Keep the failing test. Do not weaken it to match the starter.
 
-- [ ] A normalized high finding has the exact expected score/action.
-- [ ] Whitespace-only input is rejected without changing saved findings.
-- [ ] The service validates direct callers as well as form input.
-- [ ] Form feedback is accessible and failed saves preserve values.
-- [ ] Tests/build pass, with commands and evidence recorded.
-- [ ] I reviewed a bounded diff and identified criteria still needing evidence.
+### D. Execute the approved correction
 
-**Common traps:** using `.length` for Unicode, validating after appending,
-stringifying invalid values, duplicating rules, and clearing the form before a
-failed write. Reproduce the smallest failing case and verify unchanged storage.
+1. Review the selected **Permissions** separately. Do not select unrestricted
+   permissions merely to demonstrate Autopilot.
+2. Select **Autopilot** and paste:
 
-**Next: [Module 3](3-security-review.md).**
+```text
+Apply only the approved whitespace-only facility check.
+Keep the regression. Reuse the existing normalization, typed facility error,
+field feedback, storage safeguards, and failed-save/retry flow.
+Do not change other-field semantics, scoring, reset, seeds, or unrelated UI.
+Do not commit, push, change branches, or add packages.
+Run the focused test, full existing Vitest suite, and build. Report exact commands,
+actual results, and remaining gaps. Stop at this checkpoint.
+```
+
+3. If organization policy disables Autopilot, execute the same approved task in
+   Interactive. Record that fallback; do not claim Autopilot was demonstrated.
+
+### E. Inspect and demonstrate
+
+1. Return to **Interactive** and inspect Source Control changes.
+2. Ask Copilot to explain the diff against the criteria without further edits.
+3. Reject a whitespace-only facility. Check field feedback, retained inputs,
+   no new finding, and no success reported for that attempt.
+4. Correct it to `  Demo Facility  ` and save. Expect `Demo Facility`,
+   **80 / Prioritize immediate review**, and a cleared form after success.
+5. Reload and verify persistence. Keep the actual test results and browser
+   observations in Chat or your own notes.
+
+## 4. Checkpoint
+
+- Demonstrate a relevant regression failing before and passing after the fix.
+- Reject blank facility names through both form and direct service calls.
+- Show normalized valid output, unchanged storage on rejection, and usable retry.
+- Preserve existing scoring, persistence, duplicates, and confirmed reset.
+- Inspect the bounded diff and record actual tests/build results.
+
+## 5. Retrospective
+
+- What did Plan clarify that the bug report did not?
+- Where did you explicitly stop Autopilot?
+- What did the regression prove, and what still needs broader testing?
+
+**Next: [Module 3 - Code, security, and accessibility review](3-security-review.md).**

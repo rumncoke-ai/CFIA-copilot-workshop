@@ -15,11 +15,18 @@ nor calculated scores are a trusted enforcement boundary. Shape checks detect
 malformed records, not all semantic tampering. Never describe this lab as
 providing authentication, shared durable records, or authoritative scoring.
 
-Security exercises focus on strict input handling, safe text rendering,
-storage assumptions, visible failures, and reviewing generated changes.
+Security review focuses on runtime input handling, safe text rendering,
+storage assumptions, visible failures, and the actual maintenance diff.
 Intentional starter gaps include text normalization/limits and rejection of
 unknown create fields. Do not treat every exercise gap as an exploitable
 vulnerability, or add an HTML blacklist instead of safe rendering.
+
+The core participant fix addresses facility-name whitespace and feedback only.
+Other-field limits and unknown-field hardening are deferred, not completed.
+The supplied specialist agents can write reports and have model/tool dependencies;
+read the [customization guide](.github/workshop-customizations.md) before invoking
+them. Keep reports synthetic and local. Automated accessibility scans and
+security suggestions are not certification or proof of production readiness.
 
 If a secret or real record is accidentally included, stop sharing the affected
 content and notify the facilitator. Revoke exposed credentials through the

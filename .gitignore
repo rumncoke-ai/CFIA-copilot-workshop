@@ -5,3 +5,8 @@ __pycache__/
 *.pyc
 node_modules/
 dist/
+playwright-report/
+test-results/
+security-reports/
+WCAG-2.1-AA/
+tests/accessibility/

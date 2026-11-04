@@ -1,128 +1,101 @@
-# Prompt playbook
+# Prompt playbook - Guided maintenance
 
-Use these templates in VS Code Copilot Chat. Replace placeholders, attach actual
-files, and keep real records, secrets, and confidential project data out of prompts.
-Copilot output is a proposal; review changes and verify results yourself.
+Use one prompt at a time with real source context and synthetic data.
+The [module guides](../docs/README.md) contain the full step-by-step workflow.
+These templates are reusable summaries, not permission to skip checkpoints.
 
-## 1. Requirements before code
-
-Use for an ambiguous feature or inconsistent input behavior.
+## 1. Understand before editing - Interactive
 
 ```text
-Do not edit code.
-Story: [USER_STORY]
-Scope and exclusions: [SCOPE]
-Reviewed rules: [FIELD_TYPES_LIMITS_SCORING_STORAGE_AND_ERRORS]
-Context: [ACTUAL_FILES_AND_OBSERVED_BEHAVIOR]
-
-Return ID | Given | When | Then | Verification.
-Specify missing/null/type handling, trim-before-code-point limits, exact outputs,
-failure effects on state, persistence/reset, and edge cases.
-Separate implemented behavior from desired behavior. List contradictions;
-do not invent inspection policy or trusted-browser security guarantees.
+Do not edit. Trace [WORKFLOW] through the attached actual source.
+Return a short explanation, source references, and a small data-flow diagram.
+Separate implemented behavior, intended behavior, and unverified assumptions.
+Do not invent infrastructure or policy.
 ```
 
-**Tracker example:** whitespace-only facility input rejects with field feedback
-and no storage change. Good criteria give exact score/action outputs and
-explicit reset/cancel behavior, not just "secure" or "user-friendly."
+Tracker example: form -> App save -> local service -> score/storage -> display.
 
-## 2. Explain, bound, apply
-
-Use for one reviewed criterion or reproduced defect.
+## 2. Diagnose, then plan - Interactive -> Plan
 
 ```text
-Do not edit yet.
-Criterion/defect: [ID_AND_EXPECTED_BEHAVIOR]
-Observed result: [REPRODUCTION]
-Allowed files: [EXACT_FILES]
-Preserve: [SCORING_STORAGE_UI_AND_ERROR_BEHAVIOR]
-Verification: [COMMAND_AND_BROWSER_CHECK]
-
-Propose the smallest complete change. Return file/function, reason, and check.
-Reuse existing helpers and identify affected callers. Explain type narrowing,
-validation order, Unicode counting, and failure-state risks. Wait for approval.
+Do not edit yet. Reproduction: [INPUT_AND_STEPS].
+Observed: [ACTUAL]. Expected: [REVIEWED_CRITERION].
+Explain the root cause with source evidence. Then propose the smallest complete
+change, affected callers, preserved behavior, and tests. Stop for plan approval.
 ```
 
-After review:
+Tracker example: spaces-only facility names pass native `required` and the
+service's existing raw empty-string check. Normalization and feedback are supplied.
+
+## 3. Establish failure, then execute - Interactive -> Autopilot
 
 ```text
-Apply only the changes I approved in [FILES]. Add the reviewed regression with
-independent expected values. Do not broaden scope, silence errors, weaken tests,
-or add dependencies without need. Run [CHECK] and report actual results/gaps.
+Add only the approved regression for [CRITERION]; do not fix implementation.
+Run [FOCUSED_COMMAND], show the expected failure, and stop.
 ```
 
-**Tracker example:** reject unknown create-input keys without changing scoring,
-valid stored output shape, or seed/reset behavior.
-
-## 3. Evidence-led review
-
-Use on a bounded diff and the adjacent callers needed to understand it.
+After inspecting the failure and approving implementation:
 
 ```text
-Review [DIFF_AND_FILES]; do not edit.
-Focus: runtime validation, safe rendering, storage assumptions, and error states.
-For each issue return file/function, reproduction, observed vs expected result,
-impact, confidence, and verification.
-Separate confirmed issues, hypotheses, existing safe behavior, and accepted
-browser-only limitations. Do not call ignored fields a successful score override
-or claim localStorage is tamper-proof. Propose only bounded remediations.
+Apply only [APPROVED_CHANGE]. Preserve [BEHAVIOR].
+Keep the regression and run [CHECKS]. Do not commit, push, expand scope,
+install packages, or weaken assertions. Report actual results and stop.
 ```
 
-**Tracker example:** reproduce the failed-load/empty-state conflict. A model's
-warning is not a confirmed vulnerability without code and behavior evidence.
+Use selected permissions; Autopilot is not unrestricted execution.
 
-## 4. Tests against an independent oracle
-
-Use reviewed criteria, not implementation details, to define expected results.
+## 4. Review evidence, not confidence
 
 ```text
-Compare [CRITERIA] with [EXISTING_TESTS]. First return missing cases and exact
-expected outputs. Then, after review, add only the approved tests.
-Use explicit score/action expectations, isolated localStorage, and full-state
-comparisons on rejection. Include trimmed 1000/1001-code-point emoji notes.
-Keep real App/form/service behavior in the UI integration test. Await user
-interactions and restore spies. Report actual command results and coverage gaps.
-Do not label jsdom a real-browser E2E test.
+Review [DIFF] against [CONTRACT] without application edits.
+Return actionable issue, file/function, reproduction, expected/actual result,
+impact, confidence, and verification. Separate confirmed findings, hypotheses,
+safe behavior, and accepted limitations. No findings is a valid result.
 ```
 
-**Tracker example:** `"\u{1F642}".repeat(1000)` is accepted after outer trimming;
-1001 copies reject without changing records. Copying production limits into
-expected assertions can preserve the same bug twice.
+Use dedicated local code review where available. For specialist security and
+accessibility roles, read the [customization guide](../.github/workshop-customizations.md)
+first; their mandatory report writes mean they are not read-only.
 
-## 5. Retrospective self-review
+Reusable files:
+
+- [Workshop security review](../.github/prompts/workshop-security-review.prompt.md).
+- [Workshop accessibility testing](../.github/prompts/workshop-accessibility-tests.prompt.md).
+- [Supplied accessibility recipe, unchanged](../.github/prompts/accessibility.prompt.md):
+  inspect limitations before use; it is not the scoped core exercise.
+
+## 5. Test against the contract
 
 ```text
-Using only [ACTUAL_DIFFS_CHECK_OUTPUT_AND_OBSERVATIONS], propose three reusable
-prompt patterns and three traps with concrete mitigations.
-For each pattern include the exact prompt, tracker example, verification
-evidence, and one next-project application. Label unverified and anticipated
-items honestly. Do not claim checks were run or experiences occurred without
-evidence. Edit only the participant notes after I review the proposal.
+Compare [CRITERIA] with [EXISTING_TESTS]; propose only missing cases first.
+After approval, use independent expected outputs, full unchanged-storage
+assertions, real integration, and isolated browser contexts. Include
+[POSITIVE_NEGATIVE_REGRESSION_CASES]. Report actual commands and remaining gaps.
+Do not call jsdom E2E or passing axe checks full accessibility conformance.
 ```
+
+Tracker example: blank rejection -> correction -> normalized save -> full reload.
 
 ## Participant notes
 
 Complete during [Module 5](../docs/5-retrospective.md).
 
-### Three patterns and next-project applications
-
-| Pattern | Exact prompt used | Tracker example | Verification evidence | Next use in my project |
-| --- | --- | --- | --- | --- |
-| 1 | | | | |
-| 2 | | | | |
-| 3 | | | | |
-
-### Three traps and mitigations
-
-| Trap | Observed or anticipated | Tracker example | Concrete mitigation |
+| Pattern | Exact prompt used | Tracker evidence | Next-project application |
 | --- | --- | --- | --- |
 | 1 | | | |
 | 2 | | | |
 | 3 | | | |
 
-### Next action and remaining evidence
+| Trap | Observed or anticipated | Concrete mitigation | Tracker example |
+| --- | --- | --- | --- |
+| 1 | | | |
+| 2 | | | |
+| 3 | | | |
 
-- Next-project task and selected habit:
-- Context I will supply:
-- Specific verification check:
-- Remaining workshop limitation or unverified criterion:
+### Handoff
+
+- Symptom and root cause:
+- Bounded fix and preserved behavior:
+- Actual checks and review decisions:
+- Remaining limitations/manual checks:
+- One next-project action:
