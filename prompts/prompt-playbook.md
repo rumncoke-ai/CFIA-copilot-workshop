@@ -53,28 +53,31 @@ impact, confidence, and verification. Separate confirmed findings, hypotheses,
 safe behavior, and accepted limitations. No findings is a valid result.
 ```
 
-Use dedicated local code review where available. For specialist security and
-accessibility roles, read the [customization guide](../.github/workshop-customizations.md)
-first; their mandatory report writes mean they are not read-only.
-
-Reusable files:
-
-- [Workshop security review](../.github/prompts/workshop-security-review.prompt.md).
-- [Workshop accessibility testing](../.github/prompts/workshop-accessibility-tests.prompt.md).
-- [Supplied accessibility recipe, unchanged](../.github/prompts/accessibility.prompt.md):
-  inspect limitations before use; it is not the scoped core exercise.
+Use dedicated local code review where available. For security or accessibility
+review, choose the specialist from Chat's agent selector. If you can't find it,
+choose **Agent** mode and use the review instructions in Module 3. Review
+any proposed report file before allowing it to be written.
 
 ## 5. Test against the contract
 
 ```text
-Compare [CRITERIA] with [EXISTING_TESTS]; propose only missing cases first.
-After approval, use independent expected outputs, full unchanged-storage
-assertions, real integration, and isolated browser contexts. Include
-[POSITIVE_NEGATIVE_REGRESSION_CASES]. Report actual commands and remaining gaps.
-Do not call jsdom E2E or passing axe checks full accessibility conformance.
+Act as a QA engineer. Read the current source and existing tests.
+Create a small test contract with requirement IDs, concrete expected outcomes,
+and a mapping to unit, integration, and browser/manual checks. Identify gaps.
+Stop for review before changing tests. No earlier module outputs are required.
+After review, add only missing cases using the existing runners.
+Use independent expected values, real integration, and isolated browser contexts.
+Include normal, edge, and invalid cases where the contract supports them.
+Preserve existing tests; do not weaken assertions to make failures disappear.
+Report actual passed/failed counts, commands, coverage where available, and gaps.
+Do not claim browser/mobile/manual checks unless performed, call jsdom E2E,
+or call passing axe checks full accessibility conformance.
 ```
 
-Tracker example: blank rejection -> correction -> normalized save -> full reload.
+Tracker example: literal severity scores -> form/service save -> browser reload,
+with a short axe/keyboard check. See the standalone
+[Module 4](../labs/4-testing.md); record the intentional whitespace defect as a
+known gap rather than repeating Module 2.
 
 ## Participant notes
 

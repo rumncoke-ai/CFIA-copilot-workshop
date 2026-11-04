@@ -14,7 +14,7 @@ Use synthetic data; scoring is not official CFIA policy.
 | 1 | 15 min | Interactive explanation verified against source. |
 | 2 | 35 min | Interactive -> Plan -> regression failure -> bounded Autopilot fix -> human verification. |
 | 3 | 25 min | Dedicated code review plus specialist security/accessibility review decisions. |
-| 4 | 35 min | Unit/service, integration, browser E2E, scoped accessibility evidence. |
+| 4 | 35 min | Standalone contract -> unit -> integration -> browser, including a short accessibility check. |
 | 5 | 10 min | Handoff and reusable prompting/verification habits. |
 
 Modules 1-5 total **120 minutes**. Including the separate 15-minute prerequisite
@@ -50,8 +50,9 @@ npm.cmd --prefix .\client run build
 ```
 
 Prepare browser downloads using the approved organizational network/cache.
-Do not weaken security policy or let participants install tooling during the
-testing module. If Chromium cannot be provisioned, resolve before delivery;
+Do not weaken security policy. Pre-provision Chromium for workshop delivery;
+standalone participants follow Module 4's setup. If it cannot be provisioned,
+resolve access before browser exercises;
 a manual browser check is not equivalent to the core automated E2E checkpoint.
 
 Playwright owns a Vite server on **127.0.0.1:5174**, refuses unknown existing
@@ -60,32 +61,24 @@ servers, and stops its managed server afterward. The manual app remains on
 and build/typecheck includes browser-test/config types.
 
 The supplied two browser cases establish existing valid save/reload/reset
-behavior and an initial-page axe scan. Bug-specific tests are participant work,
-not failing tests shipped in the starter. Module 4 adds invalid/corrected states.
+behavior and an initial-page axe scan. Module 4 starts with a fresh behavior
+contract and adds missing coverage, not another whitespace regression.
+It works on the unfixed starter or an attendee's already-fixed app.
 The accessibility command matches test paths containing `accessibility`; keep
 new cases in `accessibility.spec.ts` or `*.accessibility.spec.ts`.
 
 Reports are local ignored outputs. `test:e2e:report` starts a viewer; stop it with
 Ctrl+C. Inspect axe JSON and retained failure traces rather than guessing causes.
 
-## Customization preparation
+## Agent picker preparation
 
-Read [agents and prompts](../.github/workshop-customizations.md).
-
-1. Verify the supplied files remain unchanged from the approved originals.
-2. Verify workspace discovery in the actual agent/prompt pickers. Both `.md`
-   agent definitions are supported by the current reference; do not assume that
-   valid filenames guarantee model/tool compatibility.
-3. Check **Claude Sonnet 4** availability and supported tool identifiers. Rehearse
-   the real invocation, not only file inspection.
-4. Preview mandatory report/plan writes. The supplied accessibility agent is
-   not read-only; it names more than one plan/output location.
-5. Explain the standard-agent fallback when a model/tool is unavailable. Label
-   the fallback honestly; do not claim a specialist ran.
-6. Preserve the WCAG 2.1 baseline labels on the originals. The workshop companion
-   targets scoped WCAG 2.2 AA checks, including applicable additions.
-7. Discuss the supplied prompt's incorrect blanket empty-alt assertion and its
-   Perceivable-only final execution. Do not run that recipe verbatim as the core.
+1. In Chat, click the agent selector at the top and confirm the security and
+   accessibility specialists appear.
+2. Ask attendees to choose the named specialist for each review. If they can't
+   find it, select **Agent** mode and paste the prompt provided in the lab.
+3. Before allowing a specialist to write a report or plan, review the proposed
+   file path. Keep outputs local and use synthetic data.
+4. Explain that accessibility results are checks, not a full conformance claim.
 
 Model/picker/tool behavior requires live verification in the delivery environment.
 Repository tests cannot validate those UI/account-dependent prerequisites.
@@ -125,11 +118,16 @@ GitHub PR review is not required and is not the same surface as custom agents.
 
 ### Module 4 - Test
 
-Expand missing evidence rather than duplicate Module 2 regressions. Use literal
-expected score/action outputs and complete storage comparisons.
-Run real-browser invalid -> correction -> save -> reload and reset preservation.
-No fixed sleeps or network mocks are needed. Reuse the preconfigured browser runner.
-Use axe/DOM assertions plus manual keyboard checks, and state what remains unverified.
+Use [Module 4](../labs/4-testing.md) independently of Modules 1-3.
+Participants create `labs/04-test-plan.md` with a small contract and requirement
+mapping, then add missing unit, integration, and browser coverage. Existing tests
+already cover much of the behavior; do not reward duplicate tests or test counts.
+Use literal expected score/action outputs and real form/service integration.
+Keep the whitespace defect as a known gap if present; preserve earlier fixes.
+Reuse the preconfigured browser runner for valid save/reload journeys and retain
+reset coverage. Finish with a saved-state axe scan and short manual keyboard
+check, not another specialist workflow. Report actual results and unverified gaps;
+coverage percentages are unavailable unless separately configured.
 
 ### Module 5 - Reflect
 

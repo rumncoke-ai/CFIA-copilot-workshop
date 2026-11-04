@@ -20,7 +20,7 @@ improvement. The fix and expected behavior are explained directly in the lab.
 
 **Use synthetic data only.** Scores are not official CFIA policy or AI predictions.
 Browser records and client-side scores remain user-editable, not trustworthy
-production controls. See [security boundaries](SECURITY.md).
+production controls.
 
 ## Workshop modules
 
@@ -30,7 +30,7 @@ production controls. See [security boundaries](SECURITY.md).
 | [1 - Understand the inherited application](docs/1-requirements.md) | 15 min | Source-grounded data flow and architecture diagram. |
 | [2 - Fix the bug from start to finish](docs/2-implementation.md) | 35 min | Interactive -> Plan -> bounded execution, with regression evidence. |
 | [3 - Code, security, and accessibility review](docs/3-security-review.md) | 25 min | Review decisions backed by evidence, using supplied specialist roles. |
-| [4 - Testing and confidence](docs/4-testing.md) | 35 min | Unit/service, UI integration, real-browser E2E, and scoped accessibility checks. |
+| [4 - Build confidence with tests](labs/4-testing.md) | 35 min | Standalone contract-first unit, integration, and browser testing, with a short accessibility check. |
 | [5 - Retrospective and operational reuse](docs/5-retrospective.md) | 10 min | Handoff and reusable prompting/verification habits. |
 
 Modules 1-5 total **120 minutes**, excluding the unchanged 15-minute prerequisite
@@ -50,10 +50,8 @@ investigation prompts explicitly prohibit edits. Other harnesses can have differ
 controls. Module 0 is intentionally unchanged; where its older mode wording
 differs, follow the current controls described here and in Module 1.
 
-The [supplied custom agents and prompts](.github/workshop-customizations.md)
-are preserved unchanged. Read their model/tool/output limitations before use.
-Their accessibility baseline is WCAG 2.1 AA; separate workshop guidance targets
-scoped WCAG 2.2 AA checks, not full conformance.
+For accessibility, the supplied helper is based on WCAG 2.1 AA. This workshop
+also checks selected WCAG 2.2 AA items; neither is a full conformance review.
 
 ## Quick setup
 
@@ -101,7 +99,9 @@ npm.cmd --prefix .\client run test:e2e:report
 The report viewer runs until **Ctrl+C**. Browser downloads may require approved
 network access; see [facilitator preparation](instructor/facilitator-guide.md).
 The supplied browser tests cover existing valid behavior and a baseline axe
-scan. Participants add the bug-specific and additional accessibility cases.
+scan. Module 4 works without earlier modules: participants create a small test
+contract and add missing coverage, with accessibility inside the browser exercise.
+The intentional whitespace defect is a known gap, not a prerequisite repair.
 Vitest/jsdom tests are not browser E2E; an axe pass is not WCAG conformance.
 
 Start with the [participant overview](docs/README.md).

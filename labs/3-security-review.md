@@ -20,12 +20,8 @@ Neither replaces human judgment or proves production readiness.
 1. Keep your Module 2 changes available in Source Control.
 2. Confirm the expected behavior: reject whitespace-only facility names before
    storage access, show the existing field feedback, retain inputs, and allow a
-   corrected name to save normally. Read the [security boundaries](../SECURITY.md).
-3. Open the [customization guide](../.github/workshop-customizations.md). Inspect
-   both supplied agent definitions before invoking them. They are preserved
-   unchanged, pin a model, list version-dependent tools, and can write reports.
-4. Confirm the specialist appears in your Copilot harness agent picker and that
-   its model/tools are available. If not, use the labelled fallback below.
+   corrected name to save normally. The app uses synthetic data and browser
+   storage; scores and saved records can be changed by the user.
 
 ### B. Review correctness with the dedicated local review feature
 
@@ -52,35 +48,42 @@ No findings is valid. Do not treat stylistic preferences as confirmed defects.
 4. Label this fallback **chat-based review**, not dedicated Copilot code review.
    This exercise does not require a GitHub PR, commit, push, or remote reviewer.
 
-### C. Review security with the supplied custom agent
+### C. Review security
 
-1. Select **security-expert** (the supplied file's default name), or the
-   corresponding displayed agent name.
-2. Attach the actual diff, service, rendering code, and security boundaries.
-3. Read the [security review prompt](../.github/prompts/workshop-security-review.prompt.md).
-   Invoke `/workshop-security-review` without switching away from the selected
-   specialist, or paste its body if prompt invocation changes roles in your UI.
-4. Expect evidence-led review of runtime values, literal rendering, and browser
-   storage assumptions. The supplied agent may write a report under
-   `security-reports`; preview any proposed write.
-5. Do not describe ignored extra fields as successful score overrides, or local
+1. In Chat, click the agent selector at the top and choose **security-expert**.
+   If you can't find it, choose **Agent** mode instead.
+2. Attach the actual diff, service, and rendering code, then paste:
+
+```text
+Review the facility-name fix and nearby service/rendering code. This is a
+synthetic-data, browser-only app with no backend. Check runtime input validation,
+validation before storage writes, safe text rendering, error handling, and
+localStorage assumptions. Use OWASP Top 10:2025 as an awareness guide, not proof
+that every category applies.
+
+For actionable findings, include the file/function, evidence and reproduction,
+expected versus actual behavior, severity, impact, confidence, a minimal fix,
+and a focused check. Separate confirmed vulnerabilities, reliability issues,
+hypotheses, safe behavior, and demo limitations. No findings is valid. Do not
+invent remote attacks, authentication, APIs, or tamper-proof browser storage.
+Do not edit code; propose fixes for review. Report checks only if performed.
+```
+
+3. The specialist may offer to write a report. Review the proposed file before
+   allowing a write; keep any report local.
+4. Do not describe ignored extra fields as successful score overrides, or local
    user edits as proof of a remote exploit. No backend/authentication is in scope.
-6. If model/tools are unavailable, select the standard agent in Interactive and
-   use the same prompt body. Record **standard-agent fallback**, not a specialist run.
 
-### D. Review accessibility with the supplied custom agent
+### D. Review accessibility
 
-1. Select **Accessibility Expert**. Inspect the unchanged
-   [definition](../.github/agents/accessibility.md).
-2. It mandates creating a WCAG 2.1 testing-plan document. This is **not read-only**.
-   Review proposed output paths before invocation; allow only workshop report/
-   plan outputs, not unsolicited application fixes.
-3. Attach the form, feedback/error flow, and styles. Paste:
+1. In Chat, click the agent selector at the top and choose **Accessibility Expert**.
+   If you can't find it, choose **Agent** mode instead.
+2. Attach the form, feedback/error flow, and styles. Paste:
 
 ```text
 Review the facility-name workflow and its invalid/corrected states.
-Do not change application code or install tools. Your definition mandates
-testing-plan output: preview the path and limit file writes to that plan.
+Do not change application code or install tools. If you propose a testing-plan
+file, show its path and wait for approval before writing it.
 Check labels, field/error association, aria-invalid, keyboard operation,
 visible focus, correction/retry, and discoverable error/status feedback.
 Return evidence and applicable WCAG references; separate observed behavior,
@@ -89,10 +92,10 @@ do not present it as a complete WCAG 2.2 evaluation or conformance certification
 Stop after findings and the plan.
 ```
 
-4. Supplement its 2.1 findings with relevant **WCAG 2.2 AA** checks, particularly
+3. Supplement its 2.1 findings with relevant **WCAG 2.2 AA** checks, particularly
    focus not obscured and target size, where applicable. See the
    [W3C additions](https://www.w3.org/WAI/standards-guidelines/wcag/new-in-22/).
-5. Manually navigate and correct the form using the keyboard. Record screen-reader,
+4. Manually navigate and correct the form using the keyboard. Record screen-reader,
    zoom, contrast, and other checks as unverified unless actually performed.
 
 ### E. Decide, then correct
@@ -118,7 +121,7 @@ Stop after findings and the plan.
 
 - Distinguish dedicated code review, specialist review, and chat fallback.
 - Show each finding's evidence, disposition, and verified correction if accepted.
-- Explain the custom agents' actual capabilities and report-writing limits.
+- Explain what you reviewed and what you did not verify.
 - Separate WCAG 2.1 agent guidance from the workshop's scoped 2.2 AA target.
 - Make no blanket security or accessibility-conformance claim.
 
