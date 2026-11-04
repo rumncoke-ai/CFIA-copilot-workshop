@@ -1,0 +1,80 @@
+trigger:
+  branches:
+    include:
+      - main
+
+# Azure Repos Git requires a main-branch build-validation policy for PRs.
+pr:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: windows-latest
+
+stages:
+  - stage: Setup
+    displayName: '1 - Setup dependencies'
+    jobs:
+      - job: Install
+        steps:
+          - checkout: self
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '3.14'
+              architecture: x64
+            displayName: Select Python
+          - task: NodeTool@0
+            inputs:
+              versionSpec: '24.x'
+            displayName: Select Node.js
+          - powershell: |
+              .\scripts\setup-env.ps1
+            displayName: Install backend and frontend dependencies
+
+  - stage: Test
+    displayName: '2 - Run tests'
+    dependsOn: Setup
+    condition: succeeded()
+    jobs:
+      - job: Verify
+        steps:
+          - checkout: self
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '3.14'
+              architecture: x64
+            displayName: Select Python
+          - task: NodeTool@0
+            inputs:
+              versionSpec: '24.x'
+            displayName: Select Node.js
+          # A new stage has a fresh agent; restore dependencies again.
+          - powershell: |
+              .\scripts\setup-env.ps1
+            displayName: Restore test dependencies
+          # Missing client scripts.test is explicitly skipped until Module 4.
+          - powershell: |
+              .\scripts\run-tests.ps1
+            displayName: Test server and configured client suite
+
+  - stage: Build
+    displayName: '3 - Build client'
+    dependsOn: Test
+    condition: succeeded()
+    jobs:
+      - job: Bundle
+        steps:
+          - checkout: self
+          - task: NodeTool@0
+            inputs:
+              versionSpec: '24.x'
+            displayName: Select Node.js
+          - powershell: |
+              npm.cmd --prefix .\client ci
+              exit $LASTEXITCODE
+            displayName: Restore frontend dependencies
+          - powershell: |
+              npm.cmd --prefix .\client run build
+              exit $LASTEXITCODE
+            displayName: Type-check and build frontend
