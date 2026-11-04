@@ -64,8 +64,7 @@ supports it. Name one remaining limitation from
 For the **5-minute fast path**, spend two minutes on patterns, one on traps,
 one on transfer, and one on the partner debrief. Still capture all three of each.
 
-Stop each local server with Ctrl+C in its own terminal when finished, unless
-continuing to [optional Module 6](optional-6-azure-devops-cicd.md).
+Stop the single local app with Ctrl+C in its terminal when finished.
 
 ## 4. VS Code + GHCP prompts to run
 
@@ -94,7 +93,7 @@ Wait for approval. After approval, apply only that change and summarize the diff
 ```
 
 Use for: a focused bug fix or hardening change. Tracker example: reject unknown
-POST fields without rewriting scoring or storage.
+create-input fields without rewriting scoring or storage.
 
 **Pattern 3 - Test against an independent oracle**
 
@@ -105,7 +104,8 @@ State what each test proves, its mocked boundaries, and remaining coverage gaps.
 ```
 
 Use for: regression tests around an existing feature. Tracker example:
-1000/1001-code-point notes and the UI flow's mocked-network boundary.
+1000/1001-code-point notes and the distinction between jsdom localStorage
+integration and real-browser reload checks.
 
 ## 5. Checkpoint
 

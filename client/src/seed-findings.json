@@ -1,0 +1,11 @@
+[
+  {
+    "inspector_id": "DEMO-001",
+    "facility_name": "Synthetic Seed Facility",
+    "inspection_type": "Routine",
+    "severity": "low",
+    "notes": "Synthetic example only: routine storage observation.",
+    "risk_score": 20,
+    "follow_up_action": "Routine follow-up"
+  }
+]

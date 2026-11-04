@@ -1,3 +1,4 @@
+# Keep legacy local environments/caches untracked after the frontend-only migration.
 .venv/
 __pycache__/
 .pytest_cache/

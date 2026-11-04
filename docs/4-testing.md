@@ -2,322 +2,162 @@
 
 ## 1. Objective
 
-**Timebox: 20 minutes.** Turn the reviewed
-[acceptance criteria](../requirements.md) and
-[Module 3 findings](3-security-review.md) into local regression tests.
+**Timebox: 20 minutes.** Extend the preconfigured frontend tests using reviewed
+[criteria](../requirements.md) and Module 3 findings as independent oracles.
+Add at least one new edge-case regression beyond Modules 2/3.
 
-Cover three layers:
+Use Vitest, jsdom, React Testing Library, and user-event, already installed by
+`npm ci`. Do not introduce another runner or spend the module configuring one.
 
-- Risk scoring logic: exact score and follow-up for each severity.
-- API behavior: validation, response contract, and no storage change on rejection.
-- One automated UI happy path: load, enter, save, confirm, and list a finding.
+## 2. Why this matters
 
-Add **at least one new edge-case test**, beyond tests added in Modules 2/3.
-Do not generate tests solely by copying what the implementation currently does.
-
-## 2. Why this matters in real SDLC
-
-A test needs an independent oracle: the reviewed expected behavior. If Copilot
-derives both implementation and expected values from the same code, it can
-preserve the same mistake twice.
-
-For the inspection team, "high returns 80 and Prioritize immediate review" and
-"an invalid request does not add a finding" are meaningful assertions.
-"The response contains something" is not enough.
-
-Passing tests prove the cases they exercise. Sufficient confidence also depends
-on coverage of relevant risks, meaningful assertions, integration evidence,
-and honest treatment of untested behavior.
+Copilot can reproduce the same mistake in both implementation and tests.
+Expected values must come from the reviewed contract, not production constants.
+Tests prove only their exercised cases; a green build is not UI verification.
 
 ## 3. Tasks
 
-### A. Map criteria to test evidence (2 minutes)
+### A. Map criteria to evidence
 
-Open [requirements.md](../requirements.md) before the implementation.
-Run Prompt 1 and review this minimum test map:
+Inspect the existing tests before requesting new ones:
 
-| Criteria | Test layer and oracle |
+| Criteria | Test file and expected evidence |
 | --- | --- |
-| F-03 / V-04 | Parameterized risk unit test: `low` -> `(20, "Routine follow-up")`, `medium` -> `(50, "Schedule follow-up inspection")`, `high` -> `(80, "Prioritize immediate review")`. |
-| F-01 / F-02 | API tests: full normalized POST 201 object, GET 200 array, creation order, empty list, and allowed duplicate submissions. Preserve earlier normalization coverage. |
-| F-05 / V-01 through V-05 | API tests: invalid field types/values return 422 and leave the stored list unchanged; valid boundaries return 201. |
-| Unknown-field rule | Preserve Module 3 rejection tests for extra score, action, and unrelated fields. |
-| F-04 | UI test: initial GET, form submission, exact POST payload, returned score/action, new list entry, and form reset. |
-| New edge case | Notes with 1000 Unicode code points accepted, 1001 rejected; verify outer trimming and preserved internal text. |
+| F-03 / V-04 | [risk.test.ts](../client/src/risk.test.ts): explicit 20/50/80 score/action values. |
+| F-01 / F-02 | [findings.test.ts](../client/src/findings.test.ts): full normalized result, creation order, duplicates, explicit empty list. |
+| F-05 / V-01 through V-05 | Service tests: invalid runtime types/values identify fields and leave the full stored list unchanged. |
+| Unknown-field rule | Preserve Module 3 regressions for score, action, and unrelated keys. |
+| F-04 | [App.test.tsx](../client/src/App.test.tsx): real form/service save, exact confirmation, list entry, form reset, failed-write retention/retry. |
+| F-06 / NF-03 | Seed initialization, persisted read-back, reset/cancel, malformed data, unavailable storage, and failed writes/reset. |
+| New edge case | Notes at 1000/1001 Unicode code points, after trimming. |
 
-Record additional NF-01/NF-02/NF-03 evidence from Module 3 separately.
-One mocked UI test cannot establish safe handling of every input, real network
-failures, or backend restart behavior.
+Baseline tests do not establish the entire validation contract. Keep earlier
+regressions; add missing cases rather than duplicating existing happy paths.
 
-**Stop and verify:** each planned test names criterion IDs, concrete input,
-and expected output from the requirements, not from a production constant.
+### B. Extend service tests
 
-### B. Generate and refine backend tests (7 minutes)
+In [findings.test.ts](../client/src/findings.test.ts):
 
-Run Prompt 2 with the criteria, [risk.py](../server/risk.py),
-[app.py](../server/app.py), [models.py](../server/models.py), and
-[test_app.py](../server/test_app.py).
+1. Preserve exact risk/action assertions; never read expected values from the
+   production rule table.
+2. Parameterize missing, `null`, numeric, empty, whitespace-only, invalid severity,
+   and over-limit inputs. For truly dynamic values, design the validator to
+   accept `unknown` and narrow it; do not add `as any` just to bypass typing.
+3. Seed a valid finding, record the complete list and serialized storage,
+   attempt invalid creation, and assert rejection plus unchanged state.
+4. Also verify rejection does not initialize storage when the key is absent.
+5. Test each exact maximum with all other fields valid. Compare normalized
+   fields in the resolved object and stored list.
+6. Preserve order, allowed duplicates, explicit `[]`, and error/reset coverage.
 
-Keep the tests in the existing [test_app.py](../server/test_app.py) for this lab.
-Reuse its client fixture so API state is cleared before and after each test.
-TestClient uses the real FastAPI app in process; no running Uvicorn is required.
+**Required new edge case:** notes consisting of `"\u{1F642}".repeat(1000)`,
+wrapped in outer spaces, must be accepted after trimming. With 1001 copies they
+must reject and preserve storage. The valid string has 1000 code points but
+2000 UTF-16 code units, exposing `.length` mistakes.
 
-1. Add a parameterized unit test of `calculate_risk`. Write expected tuples
-   explicitly; do not read expected values from `RISK_RULES`.
-2. Preserve earlier happy-path, normalization, and unknown-field tests.
-   Add creation-order and duplicate-submission assertions if absent.
-3. Parameterize API rejection cases: omitted, `null`, numeric, empty, and
-   whitespace-only text; invalid severities `High`, `critical`, and `" high "`;
-   each text field one code point over its maximum.
-4. For rejection tests, seed one valid finding, capture GET, submit the invalid
-   request, and assert both HTTP 422 and the **full unchanged GET list**.
-   Assert the error identifies the offending field, without depending on an
-   entire framework-version-specific error message.
-5. Test valid maximum lengths for all four free-text fields with other fields
-   valid. Compare normalized values in both POST and GET.
-
-**Required new edge case:** use Python `"\U0001F642" * 1000` for notes in an
-otherwise valid payload. Wrap it in outer spaces; the API must accept it and
-return exactly the 1000-code-point text after trimming. With 1001 copies, it
-must reject the request and preserve the prior list.
-
-This catches byte/code-unit counting and validation-before-trimming mistakes
-that ordinary ASCII examples miss. Keep internal whitespace preservation as
-another explicit assertion or case.
-
-Run from a repository-root PowerShell check terminal:
+Add a separate internal-newline/space preservation assertion if not already
+covered. Do not change the contract to make a generated test pass.
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest .\server\test_app.py -q
+npm.cmd --prefix .\client test -- src\findings.test.ts src\risk.test.ts
 ```
 
-Expected: all original and new cases pass. The exact count depends on your
-parameterization; do not use the old "2 passed" as this module's target.
+### C. Extend the real UI flow
 
-**Stop and verify:** inspect assertions before accepting generated tests.
-They must compare exact outputs and unchanged state, not merely assert that
-requests return a response.
+In [App.test.tsx](../client/src/App.test.tsx), keep the real App, form, local
+service, scoring, and jsdom localStorage. There is no `fetch` to stub.
+Use storage failure injection only for the failure cases.
 
-### C. Add one automated UI happy path (6 minutes)
+Preserve the happy path:
 
-The starter currently has build/typecheck commands, but **no UI test runner**.
-Use Vitest, jsdom, and React Testing Library for a fast local component flow.
-This is a browser-like DOM test, not a real-browser end-to-end test.
+- Load the seed record; fill controls by label using `userEvent`.
+- Save one high-severity synthetic finding.
+- Assert exactly **80** and **Prioritize immediate review** in the saved status.
+- Assert the new list entry, cleared form, and persisted record.
+- Refresh findings, then unmount/remount and verify the saved record remains.
 
-From the repository root:
+Add one post-hardening case: submit whitespace-only facility text and assert
+accessible field feedback, unchanged persisted data, and retained inputs.
+Alternatively add the literal-markup regression if field coverage already exists.
+
+Use `findByRole` or `waitFor`, not fixed sleeps. Scope duplicate text assertions
+to the saved status or findings region. Restore spies and clean DOM/storage
+between cases so order does not affect results. `localStorage.clear()` is safe
+in isolated jsdom test setup, not in application reset code.
 
 ```powershell
-npm --prefix .\client install --save-dev vitest jsdom `
-    @testing-library/react @testing-library/user-event
+npm.cmd --prefix .\client test
+npm.cmd --prefix .\client run build
 ```
 
-This intentionally adds test dependencies. Retain the updated package manifest
-and lockfile; subsequent setup can use `npm ci`.
+Or use [run-tests.ps1](../scripts/run-tests.ps1) for the same non-watch suite.
+The exact test count grows with participant work; do not target the baseline
+count or claim comprehensive coverage from it.
 
-Run Prompt 3. Ask Copilot to make only these changes:
+### D. Check the browser boundary
 
-- In [client/package.json](../client/package.json), add `"test": "vitest run"`.
-  Keep dev, typecheck, and build scripts intact.
-- In [vite.config.ts](../client/vite.config.ts), use `defineConfig` from
-  `vitest/config` and add `test: { environment: "jsdom" }`.
-  Preserve the existing host, port, and API proxy.
-- Create a colocated `client/src/App.test.tsx` importing `describe`, `it`,
-  `expect`, `vi`, and `afterEach` explicitly from Vitest.
-  No global test APIs, snapshot-only checks, or extra matcher packages are needed.
+With the app running, verify save -> full browser reload -> same record;
+cancel reset -> unchanged data; confirm reset -> only seed records.
+Use the same origin/profile throughout.
 
-The single happy-path test should:
+jsdom tests validate component/service integration and storage interactions.
+They do **not** prove browser quota behavior, real layout, cross-profile
+persistence, accessibility with assistive technology, or trustworthy scores.
+Record browser observations separately. There is no network/backend integration
+to claim. Browser reload is stronger evidence than the App's Refresh button alone.
 
-1. Render the real [App](../client/src/App.tsx) and its form, keeping the real
-   [API utility](../client/src/api.ts).
-2. Stub only `fetch` with `vi.stubGlobal`. Initial GET returns `[]`; POST returns
-   the explicit Module 1 high-severity expected object; subsequent GET returns
-   that object in an array. Use real `Response` objects with JSON content.
-3. Fill Inspector ID, Facility name, Inspection type, Severity, and Notes
-   through labels using `userEvent.setup()`. Await all interactions.
-4. Select **Save finding** and assert exactly one POST, its parsed JSON body,
-   and its content-type header. The body contains only the five input fields.
-5. Assert the saved confirmation and list show **80** and
-   **Prioritize immediate review**, and the form clears.
-6. Select **Refresh findings** and verify another GET and the existing entry.
-   This is the App's refresh control, not a full browser reload.
+### E. Record confidence honestly
 
-Use `findByRole` or `waitFor` for asynchronous changes; no fixed sleeps.
-Scope assertions to the saved status and findings region to avoid ambiguous
-matches when the score appears twice. Use ordinary Vitest assertions on text,
-input values, and counts; do not use `toBeInTheDocument` without its matcher setup.
+Update [requirements.md](../requirements.md) with:
 
-Clean up with React Testing Library `cleanup()` and `vi.unstubAllGlobals()` in
-`afterEach`. Keep stubbed findings inside the test so tests cannot share state.
-Do not mock `calculate_risk` or duplicate its algorithm in the fetch stub:
-return a fixed contract example.
+`Criterion ID | Test/check | Exact command | Observed result | Remaining gap`
 
-Run from the repository root:
+Run commands yourself. Distinguish pass, fail, and unverified. A failed
+command remains failed even if some assertions passed.
 
-```powershell
-npm --prefix .\client test
-npm --prefix .\client run build
-```
+## 4. VS Code + Copilot prompts
 
-Expected: the UI test passes and the TypeScript/Vite build still succeeds.
-The UI test does not need either dev server running.
-
-**Stop and verify:** the test traverses form -> real API utility -> stubbed
-HTTP response -> displayed finding, not a mocked component that skips the flow.
-Label its mocked-network boundary explicitly.
-
-### D. Interpret failures and check real integration (3 minutes)
-
-If a check fails, use Prompt 4 with the exact output:
-
-| Failure | What to do before changing code |
-| --- | --- |
-| Import, runner, or environment error | Check the working directory, virtual environment, npm manifest, and jsdom configuration. This is not yet behavioral test evidence. |
-| Wrong score/action | Compare with the Module 1 explicit oracle. Repair production scoring if wrong; do not derive expectations from the implementation. |
-| Invalid input accepted or list changed | Inspect model validation and append ordering. Keep the 422/no-change assertion. |
-| UI cannot find a control or async result | Check labels, selector scope, awaited user events, and stub responses before changing app behavior. |
-| UI test passes but real requests fail | The fetch stub did not exercise the live proxy/API. Check both servers and the real network response. |
-| Warning with passing tests | Read its source and impact. Record relevant warnings; do not suppress them or call them failures without evidence. |
-
-After a targeted fix, rerun the same focused command. Do not remove assertions,
-skip failing cases, or alter criteria merely to get green output.
-
-With both local servers running, open `http://127.0.0.1:5173`, save one synthetic
-high-severity finding, verify score/action, then reload the browser and confirm
-GET retrieves it. This live smoke check complements the mocked UI test.
-
-**Stop and verify:** separate setup failures, product failures, flawed tests,
-and warnings. Record real integration evidence separately from mocked tests.
-
-### E. Record confidence and remaining gaps (2 minutes)
-
-Add a **Module 4 test evidence** section to
-[requirements.md](../requirements.md):
-
-`Criterion IDs | Test/check | Expected behavior | Actual result |
-Boundary exercised | Remaining gap`
-
-Include the new edge case, commands, passing results, and live smoke result.
-Check every in-scope criterion against the accumulated Module 2/3/4 evidence.
-If a criterion lacks evidence, keep it unverified and record a concrete follow-up.
-Do not declare the full definition of done satisfied just because all current
-tests pass.
-
-Complete the retrospective and proceed to [Module 5](5-retrospective.md).
-
-## 4. VS Code + GHCP prompts to run
-
-### Prompt 1 - Derive tests from criteria
-
-Attach the reviewed requirements and Module 3 findings first.
+**Plan test coverage first:**
 
 ```text
-Do not edit files. Create a test matrix from our acceptance criteria, not
-from implementation details. Cover exact risk tuples, create/list behavior,
-API validation and unchanged storage, one UI happy path, and a new Unicode
-length-boundary edge case. Assign criterion IDs, inputs, explicit oracles,
-test layers, and known coverage gaps. Do not invent new requirements.
+Do not edit. Compare reviewed criteria against current risk, service, and App
+tests. Return criterion ID, existing evidence, missing case, concrete input,
+expected output, and test file. Do not infer expected values from production
+constants or call jsdom an E2E browser test.
 ```
 
-Expected: `Criterion IDs | Case | Input | Expected result | Layer | Gap` table.
-
-### Prompt 2 - Generate bounded backend tests
-
-Attach the approved matrix, backend files, and existing tests.
+**Generate bounded regressions:**
 
 ```text
-Add only the reviewed tests to server/test_app.py. Reuse the isolated client
-fixture and preserve existing tests. Parameterize explicit risk expectations,
-validation inputs, length boundaries, and unchanged-list assertions.
-Add the required 1000/1001 Unicode-code-point notes case with outer trimming.
-Do not import production constants as expected results, weaken criteria,
-or modify implementation silently. Explain each test's criterion coverage.
+Add only the reviewed cases to [TEST_FILES]. Preserve earlier regressions.
+Use explicit expected score/action values, isolated localStorage, and unchanged
+full-state assertions on rejection. Include trimmed 1000/1001 emoji notes.
+Keep real App/form/service behavior; do not mock away the feature under test.
+Await interactions and restore spies. Run the focused suite and report results.
 ```
 
-Expected: a test-only diff with exact behavioral assertions and a coverage map.
-If a test fails, investigate before approving any implementation change.
-
-### Prompt 3 - Add the UI runner and happy-path test
-
-Attach this module page, client manifest/configuration, App, form, and API utility.
+**Review confidence:**
 
 ```text
-Configure only the approved Vitest/jsdom runner and one App.test.tsx happy-path
-test described in Module 4. Preserve Vite's proxy and existing npm scripts.
-Keep real App/form/API code; stub fetch with fixed contract JSON Responses.
-Assert the POST body, exact displayed score/action, form reset, list entry,
-and GET refresh. Await user events and clean up global stubs after each test.
-Use explicit Vitest imports and standard assertions; no snapshots or sleeps
-as the only verification. Explain the mocked-network boundary.
+Using the actual test output and browser observations I supplied, map evidence
+to criteria. Identify weak assertions, missing boundaries, and unverified risks.
+Do not claim coverage percentages, browser E2E, or security guarantees without
+the corresponding evidence.
 ```
 
-Expected: a small runner/config/test diff and runnable npm commands.
+## 5. Checkpoint and retrospective
 
-### Prompt 4 - Diagnose a failed check
+- [ ] Exact scoring, service acceptance/rejection, and UI workflow tests pass.
+- [ ] A new Unicode boundary or equivalent missing edge case is covered.
+- [ ] Rejections assert unchanged storage, not merely an exception.
+- [ ] Tests use independent expected values and isolated state.
+- [ ] The build passes separately from tests.
+- [ ] Actual browser reload/reset checks and remaining gaps are recorded.
+- [ ] I can explain a case a green suite still does not prove.
 
-```text
-Do not edit yet. This command failed: [command].
-Actual output: [paste output].
-Relevant criterion and expected result: [paste criterion].
-Distinguish setup error, product defect, and incorrect test assumption.
-Identify supporting evidence, propose the smallest fix, and give the command
-to rerun. Do not skip tests, remove assertions, or change the oracle to match
-current implementation. Wait for approval before editing.
-```
+**Common traps:** mocking the local service in the only integration test,
+snapshot-only assertions, deriving expected values from production code,
+ASCII-only boundaries, leaked spies/storage, and treating component tests as
+real-browser evidence.
 
-Expected: evidence-backed diagnosis and a bounded repair, not a broad rewrite.
-
-### Prompt 5 - Assess evidence, not just green results
-
-Attach the criteria, tests, actual command output, and live smoke observations.
-
-```text
-Do not edit application code. Map actual test/check evidence to our criteria.
-Explain what the risk, in-process API, mocked-network UI, and live smoke checks
-prove separately. Identify remaining risks and missing assertions.
-Do not equate passing tests, test count, or build success with sufficient
-confidence or the full definition of done.
-```
-
-Expected: criterion evidence table plus concrete unverified cases.
-
-## 5. Checkpoint
-
-Show your partner or facilitator:
-
-- Criteria-linked tests with independent expected values.
-- Passing risk tests for all three exact score/action pairs.
-- Passing API tests for valid input, rejection, and unchanged storage.
-- **At least one new edge-case test**, including its acceptance/rejection oracle.
-- One passing automated UI create/list happy path with an explicit network stub.
-- Passing TypeScript/build and a successful live create/list smoke check.
-- A saved evidence map identifying what remains untested.
-
-The checkpoint is not a test-count target. Do not remove coverage markers
-unless the gap they describe has actually been addressed.
-
-## 6. Retrospective checklist
-
-- [ ] I can show an expected result derived from a criterion, not implementation.
-- [ ] I can explain why exact score and action assertions matter.
-- [ ] I can explain what my new edge case catches that the happy path misses.
-- [ ] I can distinguish a failing environment setup from a failing behavior.
-- [ ] I can explain why the UI fetch stub does not prove live API integration.
-- [ ] I can distinguish **passing tests** (the executed assertions passed)
-      from **sufficient confidence** (relevant risks have meaningful evidence).
-- [ ] I can name at least one untested behavior or limitation and its next check.
-- [ ] I reviewed generated tests for weak assertions and circular expectations.
-- [ ] I can justify which criteria are complete and which remain unverified.
-
-## 7. Common traps
-
-| Trap | Concrete guardrail |
-| --- | --- |
-| "Write tests for this code" without acceptance criteria | Attach the reviewed contract first and require criterion IDs and explicit oracles. |
-| Expected values imported from the scoring table | Hardcode the agreed 20/50/80 tuples in parameterized tests. |
-| Checking only HTTP 422 | Also compare the complete stored list before and after rejection. |
-| Many tests with weak assertions | Inspect response values, POST payload, state changes, and boundaries; count is not confidence. |
-| ASCII-only length tests | Add Unicode code-point boundaries and verify normalization order. |
-| Mocking the whole UI or API utility | Render actual components and use the real utility; stub only HTTP and label that boundary. |
-| Calling a jsdom test end-to-end | Describe it as a component flow and run a separate live browser smoke check. |
-| Skipping failing tests to finish on time | Record the blocker and repair the smallest cause; do not claim the checkpoint passed. |
-| Assuming green tests mean no remaining risk | Map evidence to criteria and document untested failures, inputs, and production limitations. |
+**Next: [Module 5](5-retrospective.md).**

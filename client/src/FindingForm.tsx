@@ -1,8 +1,8 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 
-import { isSeverity } from "./api";
-import type { FindingCreate } from "./api";
+import { isSeverity } from "./findings";
+import type { FindingCreate } from "./findings";
 
 interface Props {
   disabled: boolean;

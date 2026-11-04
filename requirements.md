@@ -9,16 +9,29 @@ workflow using GitHub Copilot with human review.
 
 - One continuous storyline and one app.
 - Two-hour core session using local VS Code workflows.
-- React + TypeScript frontend; Python + FastAPI backend.
-- In-memory or lightweight local storage with synthetic data.
+- One React + TypeScript app; no backend runtime or API.
+- Bundled synthetic JSON seed data and browser localStorage persistence.
+- An asynchronous local data service, pure scoring function, and confirmed demo reset.
 - Prioritize feature implementation and security/code-review hardening.
-- Optional Azure DevOps CI/CD extension: 20-25 additional minutes.
+- Preconfigured frontend tests; participants extend them against reviewed criteria.
 
 ## Feature slice
 
 Create and list inspection findings with a risk score and follow-up
 recommendation. Participants will define fields, scoring rules, validation,
 and testable acceptance criteria in Module 1 before implementation.
+
+The starter intentionally lacks text normalization/limits, strict unknown-field
+rejection, and rich field feedback. Baseline persistence and error handling are
+implemented; do not describe the exercise gaps as completed protections.
+
+## Boundaries
+
+Use synthetic data only. Browser storage and client-side scores are editable
+and cannot provide trusted validation or access control. Data is per browser
+profile/origin, survives reloads and dev-server restarts, and resets to the
+bundled example only on confirmed demo reset or reinitialization after site-data
+removal. No shared records, authentication, deployment, or CI module is included.
 
 ## Acceptance criteria
 

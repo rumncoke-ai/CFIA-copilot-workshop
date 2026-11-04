@@ -2,356 +2,168 @@
 
 ## Session contract
 
-Audience: strong intermediate engineers, mostly new to GitHub Copilot (GHCP).
-Core duration: **120 minutes**. Optional CI module: **20-25 additional minutes**.
+Audience: intermediate engineers new to GitHub Copilot. Follow the
+[participant narrative](../docs/README.md): one inherited React app, one
+inspector-lead story, and continuous improvement through Modules 0-5.
+Use synthetic data only. Scoring is not official CFIA policy.
 
-Follow the [participant narrative](../docs/README.md): one inherited Inspection
-Findings Tracker, one inspector-lead story, and one continuous improvement.
-Use synthetic data only. Scores are training rules, not official CFIA policy.
-Keep all core work in local VS Code; do not introduce GitHub.com or Codespaces
-as a rescue dependency.
+**Copilot proposes; you review; checks provide evidence.**
 
-Repeat this refrain: **"Copilot proposes; you review; checks provide evidence."**
-Do not describe generated output as deterministic or treat a green build as
-proof of secure behavior.
+| Module | Timebox | Transition |
+| --- | --- | --- |
+| 0 | 15 min | Observe the baseline and explain actual code. |
+| 1 | 15 min | Agree on measurable rules before coding. |
+| 2 | 35 min | Improve one form/service workflow, not a rewrite. |
+| 3 | 25 min | Reproduce and address distinct review findings. |
+| 4 | 20 min | Extend existing tests against independent oracles. |
+| 5 | 10 min | Capture reusable patterns and honest evidence. |
 
-| Module | Timebox | Session clock | Facilitator transition |
-| --- | --- | --- | --- |
-| 0 | 15 min | 00:00-00:15 | Baseline observed; no code changes yet. |
-| 1 | 15 min | 00:15-00:30 | Agree on rules before implementation. |
-| 2 | 35 min | 00:30-01:05 | One bounded cross-stack slice, not a rewrite. |
-| 3 | 25 min | 01:05-01:30 | Review the actual slice and reproduce findings. |
-| 4 | 20 min | 01:30-01:50 | Tests use criteria as independent oracles. |
-| 5 | 10 min | 01:50-02:00 | Convert evidence into three reusable habits. |
-| Optional 6 | 20-25 min | After 02:00 | Repeat local gates remotely; no deployment. |
-
-Timeboxes include demonstrations, checkpoints, and short debriefs. There is no
-extra buffer hidden outside the two hours.
+Core total: two hours. There is no backend or optional CI/deployment track.
 
 ## Before participants arrive
 
-- Verify VS Code, Copilot access, Python 3.11+, and Node.js 22.12+; recommend
-  Node.js 24 LTS. Account approval and tool installation are pre-work.
-- Give participants a local repository copy and verify package-feed/Copilot
-  access on the actual workshop network.
-- Run the [root setup commands](../README.md) and check ports 8000/5173,
-  baseline pytest, frontend build, and one browser create/list flow.
-- Rehearse Modules 1-4 in a **separate local working copy**. Prepare reviewed
-  small rescue diffs for normalization, form feedback, unknown-field rejection,
-  error parsing, and UI-test setup. Do not harden the distributed starter.
-- Prepare a local working checkpoint after each coding module, including its
-  criteria and test evidence. These recovery copies are **not currently
-  supplied in this repository**; create and validate them before teaching.
-- Rehearse the Vitest/jsdom installation and test on the classroom machines.
-  Module 4 adds dependencies and a runner; the starter has no frontend test script.
-- If needed, have IT prepare approved local package caches or an offline feed.
-  Do not assume a virtual environment copied between machines will work.
-- Keep one instructor machine running for paired/demo fallback. Prepare saved
-  non-sensitive prompt responses and check output for a Copilot/network outage;
-  label them as recorded examples, not live results.
-- For optional Module 6, complete its
-  [Azure DevOps pre-work](../docs/optional-6-azure-devops-cicd.md): participant
-  branches/remotes, existing pipeline IDs, CLI authentication, agent permissions,
-  parallel capacity, and runtime availability. Rehearse a successful run and
-  save a failed-gate example.
+- Verify VS Code, authorized Copilot access, Node.js 22.12+, PowerShell, and npm
+  access. Recommend Node.js 24 LTS. Account/tool provisioning is pre-work.
+- Run [quick setup](../README.md#quick-setup), tests, build, and the browser flow
+  on the actual classroom network. Only port 5173 is needed.
+- Baseline test count is **20** across scoring, local service, and App tests.
+  Participant additions change the count; assertions matter more than totals.
+- Use a separate rehearsal copy to complete Modules 1-4. Prepare small reviewed
+  rescue diffs for normalization, field feedback, unknown-field rejection,
+  failed-load presentation, and Unicode tests. Do not solve the distributed starter.
+- Prepare verified recovery checkpoints yourself; they are not supplied reference
+  solutions. Never overwrite participant work as a rescue.
+- Use a fresh browser profile or confirmed reset before demonstrating. Existing
+  localStorage survives Vite restarts. Keep the address `127.0.0.1:5173` consistent.
+- Prepare an approved package cache/feed if needed. The test tools are already
+  in the manifest/lockfile; participants should not install another runner.
+- Keep saved synthetic prompt responses and check output for outage fallback.
+  Label them as recorded examples rather than live results.
 
-**Readiness caveat:** the runnable starter and participant guides exist, but
-setup/start/test scripts and the three-stage root pipeline are available.
-Use explicit commands to teach individual steps, or keep the start script's
-supervising terminal open and use another terminal for checks.
-Do not announce reference solutions, recovery snapshots, or fully rehearsed
-module outcomes until you have prepared and verified them.
+## Architecture talk track
 
-## Room pacing for mixed speeds
+One React + TypeScript app calls an asynchronous
+[findings service](../client/src/findings.ts). On absent storage it loads a
+[bundled synthetic example](../client/src/seed-findings.json), then persists
+records in `cfia-workshop.findings.v1`. The [risk function](../client/src/risk.ts)
+maps severity to exact score/action pairs.
 
-Use three visible states, not a competition:
+There are no HTTP endpoints, credentials, database migrations, or cross-service
+startup dependencies. The Vite process serves the UI, not an inspection API.
+Promises retain meaningful load/save/error behavior without artificial latency.
 
-- **Green:** checkpoint demonstrated; proceed to a listed extension or help a partner.
-- **Amber:** working on the current step with a specific failing check.
-- **Red:** unable to run or access required tooling.
+Browser storage is not a trusted security boundary. Users can edit records,
+scores, and code. Shape checking catches malformed data but does not establish
+authenticity. Keep reliability hardening separate from production assurances.
 
-Ask for status at each module midpoint and two minutes before its end.
-Participants report **step + command + observed result**, not "Copilot is broken."
-Keep responses free of real records, tokens, or confidential project data.
+## Room pacing and recovery
 
-For a blocker:
+Use three states: **green** (checkpoint demonstrated), **amber** (specific failing
+check), **red** (unable to run tools). Ask for step + command + observed result,
+not "Copilot is broken." Pair a driver and navigator; switch roles each module.
 
-1. Spend up to **90 seconds** checking directory, runtime, exact error, and context.
-2. Offer one small correction and rerun the same check.
-3. If still blocked after roughly **three minutes**, pair with a green participant
-   or use a reviewed rescue diff. Have the learner explain and verify it.
-4. By **five minutes**, move to the fallback lane; preserve the original workspace.
-   Never overwrite participant changes or call unexecuted work complete.
+For blockers, inspect directory/runtime/exact error, make one bounded correction,
+and rerun the same check. If still blocked, pair the learner or use a reviewed
+rescue diff. Preserve their original work. Never count unexecuted checks as passes.
+Protect Module 5; shorten optional elaboration, not the evidence requirements.
 
-Pair a driver and navigator; switch roles each module. The navigator reviews
-criteria and assertions while the driver operates VS Code. Green participants
-must ask before editing another learner's code.
+## Module 0 - Setup and orientation
 
-Protect Module 5. If time slips, reduce optional elaboration and use its
-five-minute fast path, not a skipped retrospective. Missing core evidence remains
-incomplete; rescue is not permission to lower the acceptance criteria.
+**Success:** one app runs; 20 baseline tests and build pass; a high finding
+shows **80 / Prioritize immediate review**; reload retains it; cancel reset
+preserves it and confirmed reset restores the example.
 
-## Module 0 - Environment setup and baseline
+Keep the user's orientation workflow: run the app, then one Ask-mode prompt to
+explain it. No starter edits yet.
 
-**Timebox:** 15 minutes. [Participant steps](../docs/0-prereqs.md).
+**Likely blockers and recovery**
 
-**Talk track:** "You inherited an app that already works. Before improving it,
-prove the starting behavior and find the code. Ask Copilot to explain, not edit."
+- `npm.ps1` policy: use `npm.cmd`; do not weaken machine-wide policy.
+- Wrong directory: use root `--prefix .\client` commands.
+- Occupied port: identify the owner; do not kill unrelated processes.
+- Different records: confirm origin/profile; `localhost` and `127.0.0.1` differ.
+- Corrupt synthetic storage: inspect the visible error, then explicitly reset.
 
-**What success looks like:** both servers run; baseline tests report two passes;
-a high finding shows 80 / Prioritize immediate review and survives browser
-refresh; the participant locates form/API/route/scoring files and gets a
-code-grounded Copilot Chat response.
+**Debrief:** where is scoring computed, what initializes seeds, what survives a
+restart, and which Copilot claim did you compare with source?
 
-**Likely blockers:** wrong terminal directory or Python, missing dependencies,
-PowerShell npm policy, occupied ports, or unsigned-in Copilot.
+## Module 1 - Requirements
 
-**Rescue interventions:**
+**Success:** [requirements.md](../requirements.md) contains F/V/NF IDs, exact
+20/50/80 rules, 40/120/60/1000 limits, type/unknown-key rules, code-point
+boundaries, persistence/reset behavior, and a definition of done.
 
-- Use the virtual environment's executable directly; use `npm.cmd` if npm.ps1
-  is blocked. Do not weaken machine-wide execution policy.
-- Confirm Uvicorn starts at the repository root and Vite proxies to port 8000.
-- Identify port ownership with the learner; do not terminate unrelated processes.
-- Pair learners with provisioning problems rather than spend the lab installing tools.
+Model one criterion: whitespace-only facility input rejects, identifies the
+field, and leaves storage unchanged. Clarify that normalization/limits and strict
+extra-key rejection are planned, not current protections.
 
-**Debrief questions:** "Where is the score computed? What does browser refresh
-prove? What resets the list? Which claim in Chat did you check against source?"
+**Watch for:** invented CFIA policy, runtime validation assumed from TS types,
+requirements copied only from starter behavior, and production security claims.
 
-**Module-specific GHCP traps:** invented setup commands, speculative CORS fixes,
-unrequested starter rewrites, and treating two tests as comprehensive coverage.
-Require file/function evidence and keep code unchanged.
+## Module 2 - Implementation
 
-## Module 1 - Requirements and acceptance criteria
+**Success:** a normalized finding saves through the form/service, returns the
+exact score/action, and survives reload. Invalid text leaves storage unchanged,
+retains entered values, and provides usable field feedback.
 
-**Timebox:** 15 minutes. [Participant steps](../docs/1-requirements.md).
+Keep validation before any storage write and reuse shared rules. Explain why
+`Array.from(text).length` differs from `.length` for emoji. Keep scoring pure and
+leave unknown-field hardening for Module 3.
 
-**Talk track:** "Our oracle is a reviewed contract, not whatever code Copilot
-generates. Make 'consistent triage' observable before we implement it."
+Prepare a normalization-test rescue diff. Reject unrelated libraries, new
+backend infrastructure, silent catches, or test assertions weakened to match bugs.
 
-**What success looks like:** saved [requirements.md](../requirements.md) with
-F/V/NF IDs, exact scores/actions, text/type/extra-field rules, boundary cases,
-verification methods, scope, and definition of done. Desired behavior is not
-misrepresented as implemented.
+**Debrief:** what did the new regression prove, and what remains unverified?
 
-**Likely blockers:** over-designing scoring, vague non-functional criteria,
-debating production policy, or confusing document completion with feature completion.
+## Module 3 - Security and review
 
-**Rescue interventions:**
+**Success:** one input-handling issue and one distinct code-quality issue have
+reproduction, fix, and regression evidence.
 
-- Point to the fixed synthetic 20/50/80 table and 40/120/60/1000 text limits.
-- Model one Given/When/Then: a whitespace-only facility returns 422 and leaves
-  storage unchanged.
-- Ask the learner to name the input and verification for any "secure/reliable"
-  criterion. Keep authentication/persistence outside scope.
-- Use the module's provided contract as a drafting aid, but require the
-  participant to explain and save it.
+Default targets:
 
-**Debrief questions:** "What is the definition of done? Which criterion needs
-server enforcement? What behavior is observed versus not yet implemented?"
+1. Extra create-input keys are ignored: high severity still produces 80. The
+   desired strict contract rejects extras without appending. Do not describe
+   ignored `risk_score: 1` as a successful override exploit.
+2. Load failure can coexist with a successful-looking empty/stale list. Separate
+   error/empty states and provide honest retry/reset feedback.
 
-**Module-specific GHCP traps:** invented CFIA policy, omitted type/whitespace
-boundaries, unchecked assumptions, and accepting vague criteria because they sound professional.
+Have learners inspect literal markup rendering and DevTools score tampering.
+The first should already be safe React text behavior; the second demonstrates
+the browser-only trust limitation, not an invitation to add browser secrets.
 
-## Module 2 - End-to-end implementation
-
-**Timebox:** 35 minutes. [Participant steps](../docs/2-implementation.md).
-
-**Talk track:** "Keep the working create/list flow. Change one bounded slice:
-normalize valid input and provide matching feedback. Explain, approve, apply,
-then stop and verify after each layer."
-
-**What success looks like:** backend strict text validation/normalization,
-matching frontend feedback and normalized payload, one new normalization test,
-passing build/tests, exact severity outputs, and direct invalid POST rejection.
-Requirements record remaining review/testing work.
-
-**Likely blockers:** Pydantic validator ordering/coercion, JS code-unit counting,
-frontend reset on failure, stale data after reload, or a huge proposed diff.
-
-**Rescue interventions:**
-
-- Inspect trimming before length checks and strict rejection of non-strings.
-- Point out `Array.from(text).length` versus `.length`; do not silently truncate.
-- Verify the existing boolean save contract: reset only on success.
-- Wait for backend reload, then recreate data before checking GET.
-- Supply one prepared layer-sized rescue diff if needed; require review and
-  the same tests/browser checks. Do not replace the whole app.
-
-**Debrief questions:** "Which rule crosses both layers? What did your diff leave
-unchanged? Why is the score server-derived? Which check caught a wrong assumption?"
-
-**Module-specific GHCP traps:** one-shot whole-app prompts, blind diff acceptance,
-duplicated scoring, weakened assertions, and calling all criteria done after a build.
-
-## Module 3 - Security and code-quality review
-
-**Timebox:** 25 minutes. [Participant steps](../docs/3-security-review.md).
-
-**Talk track:** "Review the changed code as a draft. An API caller can bypass the
-form. A review finding needs a reproducer and measurable impact, not just a warning."
-
-**What success looks like:** one resolved security-related issue and one
-distinct quality issue, with before/after evidence and preserved valid behavior.
-Default targets are unknown-field rejection and useful, safe validation-error context.
-
-**Likely blockers:** treating ignored score input as a demonstrated override,
-counting one patch twice, inspecting only UI validation, broad error catches,
-or echoing entire error objects containing submitted input.
-
-**Rescue interventions:**
-
-- Run the extra-score reproduction. If the server returns 80, explain that
-  the gap is unexpected-field acceptance, not proven score manipulation.
-- Guide `extra="forbid"` and a 422/full-unchanged-list regression assertion.
-- Inspect the actual FastAPI error shape; extract known field context with
-  type guards, not raw input or traceback.
-- If a default issue is already resolved, select a confirmed small alternative,
-  such as misleading empty state after a failed GET. Never introduce a defect.
-- Keep safe JSX text rendering and the local-only scope.
-
-**Debrief questions:** "What changed? Why does it reduce risk? What input now
-behaves differently? Which distinct quality fix helps the inspector lead?"
-
-**Module-specific GHCP traps:** generic OWASP output, unverified exploit claims,
-HTML blacklists replacing safe rendering, silent success-shaped fallbacks,
-and a broad refactor disguised as remediation.
+Do not silently recover corrupt storage with `[]` or clear unrelated keys.
+Do not manufacture two findings from one issue. If a target was already fixed,
+select another concrete defect in current feedback/validation behavior.
 
 ## Module 4 - Tests and confidence
 
-**Timebox:** 20 minutes. [Participant steps](../docs/4-testing.md).
+**Success:** extended scoring, service, and App tests pass with a new edge case.
+Require explicit output assertions and full unchanged-state checks.
 
-**Talk track:** "Generate from the contract. Tests that copy the same wrong rule
-from production code do not provide an independent oracle."
+Default new edge: trimmed 1000 emoji notes accepted; 1001 rejected. Use
+`"\u{1F642}".repeat(1000)` so code-point and UTF-16 counts differ.
 
-**What success looks like:** explicit risk tuple tests, real in-process API
-validation/state assertions, at least one new Unicode-boundary edge case,
-one automated App flow with fetch stubbed, passing build, live smoke evidence,
-and a map of remaining gaps.
+Keep real App/form/service integration in jsdom; do not stub the only behavior
+under test. Inject storage failures only in the relevant cases. Restore spies,
+clean the DOM, and isolate localStorage between tests.
 
-**Likely blockers:** first-time Vitest/jsdom setup, unsupported assertions,
-ambiguous score text, unawaited user events, shared global state, or test expectations
-derived from `RISK_RULES`.
+**Debrief:** which checks are component evidence, which were observed in a real
+browser, and what does a green build alone fail to establish?
 
-**Rescue interventions:**
+## Module 5 - Retrospective
 
-- Use the prepared runner/config diff; retain the Vite proxy and lockfile.
-- Import Vitest APIs explicitly and use standard assertions; do not assume
-  extra DOM matchers were installed.
-- Scope UI assertions to the saved status/list; await events and async results.
-- Reuse fixture cleanup and clear global fetch stubs after each test.
-- Show the 1000/1001-code-point oracle and unchanged-list assertion.
-- Diagnose setup versus behavior failures; preserve failing criteria.
-  If the runner cannot execute, record that checkpoint as incomplete.
+**Success:** [prompt playbook](../prompts/prompt-playbook.md) has three patterns,
+three traps/mitigations, actual tracker evidence, and a next-project application
+for each pattern. Label anticipated traps and unverified claims honestly.
 
-**Debrief questions:** "What does your new edge test catch? What does the mock
-exclude? How are passing tests different from sufficient confidence?"
-
-**Module-specific GHCP traps:** snapshot-only tests, circular expected values,
-HTTP-status-only rejection checks, skipped failures, arbitrary sleeps, and
-calling jsdom a real end-to-end environment.
-
-## Module 5 - Retrospective and reuse
-
-**Timebox:** 10 minutes; five-minute fast path if needed.
-[Participant steps](../docs/5-retrospective.md).
-
-**Talk track:** "Take three habits home: criteria before code, explain/bound/apply,
-and tests against an independent oracle. Tie each to something you actually verified."
-
-**What success looks like:** [playbook](../prompts/prompt-playbook.md) records
-three prompt patterns, three traps with mitigations, three next-project
-applications, and one chosen next action.
-
-**Likely blockers:** generic lessons, invented success stories, no next-project
-task, or fatigue leading to a skipped debrief.
-
-**Rescue interventions:**
-
-- Ask for one exact prompt, criterion, command, and result to seed the entries.
-- Use the three supplied patterns and traps as templates, not claimed experiences.
-- Have each partner finish: "On my next task, I will supply X and verify with Y."
-- Use the five-minute path while preserving all three patterns/traps.
-
-**Debrief questions:** "Which habit will you try next? Which trap did you
-observe or anticipate? What remains unverified in this app?"
-
-**Module-specific GHCP traps:** vague "better prompts" advice, fabricated evidence,
-and retrospective output that promises automatic correctness.
-
-## Optional Module 6 - Azure DevOps CI handoff
-
-**Timebox:** 20-25 additional minutes.
-[Participant steps](../docs/optional-6-azure-devops-cicd.md).
-
-**Talk track:** "CI repeats the checks on the committed code, not your current
-unsaved workspace. We are learning install/test/build gates, not building a release platform."
-
-**What success looks like:** reviewed YAML, approved commit pushed to the supplied
-Azure Repos branch, remote completed/succeeded run for that commit, named gate
-results, and an explanation of failure propagation.
-
-**Likely blockers:** skipped frontend test suite, wrong branch,
-CLI permissions, unavailable hosted-agent capacity, private package feeds,
-or confusing queued with successful.
-
-**Rescue interventions:**
-
-- Confirm Module 4 files/manifests/lockfile are committed and the run source
-  commit matches the intended HEAD.
-- Use the pre-provisioned pipeline ID and authorized `workshop` remote.
-  Do not replace participant remotes or insert credentials.
-- Show the named failed-gate log and equivalent local command.
-- For access/capacity problems, switch to the prepared instructor run and label
-  learner execution not performed or pending.
-- Explain why each stage restores dependencies on a fresh agent. For Azure Repos
-  PR validation, configure the main-branch build policy before the workshop.
-  No deployment or extra service connections are needed for the Azure Repos flow.
-
-**Debrief questions:** "Which commit ran? Which local command maps to each
-gate? Why were later steps skipped? What does this green run not prove?"
-
-**Module-specific GHCP traps:** `continueOnError`, omitted UI gates, unnecessary
-dev servers, hardcoded credentials, and deployment scope creep.
+Stop the single app process with Ctrl+C. Do not erase participant evidence.
 
 ## Fast-finish extensions
 
-Offer only after the learner demonstrates the current checkpoint. Keep them
-small and connected to the same criteria; do not make them prerequisites for peers.
+- Add a regression for internal newline preservation or accessible field feedback.
+- Explain the difference between stored-shape validity and semantic consistency.
+- Verify failed reset preserves both displayed and persisted records.
 
-| Module | Extension |
-| --- | --- |
-| 0 | Trace the proxy/API request in browser network tools; explain why no CORS change is needed. |
-| 1 | Write a concrete missing/null/numeric case for each field and its exact storage effect. |
-| 2 | Verify a Unicode name at its code-point boundary and unchanged internal line breaks in notes. |
-| 3 | Review stale-list/empty-state behavior after a failed GET and propose a bounded fix with a reproducer. |
-| 4 | Add a UI failed-save test proving visible error, preserved values, no phantom entry, and re-enabled submit. |
-| 5 | Adapt one prompt to an abstract next-project task and have a partner critique its verification plan. |
-| Optional 6 | Explain how a stale lockfile fails `npm ci`, using a recorded example rather than breaking the shared branch. |
-
-Do not offer authentication, databases, new scoring algorithms, or deployment
-as fast-finish tasks; these fragment the storyline and increase support burden.
-
-## Environment fallback ladder
-
-| Failure | Practical fallback | Evidence status |
-| --- | --- | --- |
-| Copilot unavailable, code/tooling works | Use recorded prompt output and manual edits in the same VS Code files; review and run checks normally. | Code evidence can be live; Copilot interaction is not demonstrated. |
-| One participant cannot run locally | Pair on a working local machine with driver/navigator roles; preserve the blocked workspace for later repair. | Record which checks the pair actually executed. |
-| npm/package network unavailable | Use an IT-prepared approved cache/feed on the same machine; otherwise pair with a prepared machine. | Do not claim installation/test success until run. |
-| Frontend unavailable but Python works | Complete criteria, API tests, and threat review while pairing for UI work. | Frontend/build/UI checkpoint remains incomplete unless actually executed. |
-| Both runtimes unavailable | Do requirements and source-review exercises in VS Code using the instructor's local demo/recorded diffs. | Review/requirements only; no learner runtime success claim. |
-| Module 4 runner blocked | Apply a reviewed prepared runner diff and retry once; then use paired execution or label demonstration-only. | Manual smoke does not substitute for the automated UI checkpoint. |
-| Azure DevOps blocked/queued | Explain YAML locally and inspect the instructor's saved or live run. Keep run ID for later verification. | Learner remote run is unperformed or pending, not succeeded. |
-
-Never disable organizational policy, share credentials, expose the API publicly,
-or overwrite unrelated participant work to rescue a session.
-
-## Closing the room
-
-Ask participants to show a checkpoint, two specific verification results, and
-their next-project habit. Tally completed, paired, and demonstration-only outcomes
-separately. Collect remaining blockers for follow-up; do not convert them into
-success claims.
-
-End with: **"Copilot accelerated the SDLC work. Reviewed requirements,
-bounded changes, and test evidence made the result trustworthy."**
+Keep authentication, shared records, CI/deployment, new scoring policy, and
+unrequested features out of the core workshop.

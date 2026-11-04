@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 
-import { createFinding, getFindings } from "./api";
-import type { Finding, FindingCreate } from "./api";
+import { createFinding, getFindings, resetFindings } from "./findings";
+import type { Finding, FindingCreate } from "./findings";
 import FindingForm from "./FindingForm";
 
 function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "Unexpected request error.";
+  return error instanceof Error ? error.message : "Unexpected data error.";
 }
 
 export default function App() {
@@ -53,10 +53,27 @@ export default function App() {
     }
   }
 
+  async function reset(): Promise<void> {
+    if (!window.confirm("Replace all saved workshop findings with the synthetic seed data?")) return;
+    setSaving(true);
+    setError("");
+    try {
+      const data = await resetFindings();
+      setFindings(data);
+      setLatest(null);
+    } catch (cause: unknown) {
+      setError(`Could not reset findings: ${errorMessage(cause)}`);
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <main>
       <h1>CFIA Inspection Findings Tracker</h1>
       <p>Local workshop only. Use synthetic data; scores are not official CFIA policy.</p>
+      <p>Findings stay in this browser on this address. Reset demo data restores the synthetic example.</p>
+      <button disabled={loading || saving} onClick={reset}>Reset demo data</button>
       {error && <p role="alert" className="error">{error}</p>}
       <FindingForm disabled={loading || saving} saving={saving} onSubmit={save} />
 
