@@ -10,7 +10,7 @@ Use synthetic data; scoring is not official CFIA policy.
 
 | Module | Suggested duration | Transition/checkpoint |
 | --- | --- | --- |
-| 0 | 15 min, separate | Existing prerequisites; do not rewrite this guide. |
+| 0 | 15 min, separate | Verify prerequisites, run the app, and prepare browser tests. |
 | 1 | 15 min | Interactive explanation verified against source. |
 | 2 | 35 min | Interactive -> Plan -> regression failure -> bounded Autopilot fix -> human verification. |
 | 3 | 25 min | Dedicated code review plus specialist security/accessibility review decisions. |
@@ -26,8 +26,7 @@ Protect checkpoints rather than rushing through unverified output.
 - Verify quick setup, Copilot access, Node.js, npm feeds, and the classroom network.
 - Use the **Copilot** harness/session target and verify its Agent mode picker
   has **Interactive, Plan, and Autopilot**. Rehearse exact UI labels.
-  Module 0 intentionally retains older wording; point to Module 1 for current
-  controls rather than editing prerequisites.
+  Confirm participants can follow Module 0's setup and current controls.
 - Explain separately selected permissions. Never require unrestricted access.
 - Confirm the intentionally unfixed starter accepts whitespace-only facility names.
 - Run existing tests and build. Verify assertions, not a target test count.

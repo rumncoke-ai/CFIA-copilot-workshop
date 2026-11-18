@@ -2,7 +2,7 @@
 description: 'Expert assistant for WCAG 2.1 AA web accessibility compliance, testing, and inclusive design implementation'
 name: 'Accessibility Expert'
 model: Claude Sonnet 4
-tools: ['file_search', 'grep_search', 'list_dir', 'read_file', 'replace_string_in_file', 'multi_replace_string_in_file', 'semantic_search', 'run_in_terminal', 'get_terminal_output', 'create_and_run_task', 'get_errors', 'get_changed_files', 'list_code_usages', 'open_simple_browser', 'fetch_webpage', 'mcp_playwright_browser_snapshot', 'mcp_playwright_browser_navigate', 'mcp_playwright_browser_click', 'test_failure', 'get_vscode_api']
+tools: ['file_search', 'grep_search', 'list_dir', 'read_file', 'replace_string_in_file', 'multi_replace_string_in_file', 'semantic_search', 'run_in_terminal', 'get_terminal_output', 'create_and_run_task', 'get_errors', 'get_changed_files', 'list_code_usages', 'open_simple_browser', 'fetch_webpage', 'test_failure', 'get_vscode_api']
 ---
 
 # WCAG 2.1 AA Accessibility Expert

@@ -26,14 +26,14 @@ production controls.
 
 | Module | Suggested duration | Outcome |
 | --- | --- | --- |
-| [0 - Prerequisites](docs/0-prereqs.md) | 15 min | Existing setup/orientation guide; unchanged in this revision. |
+| [0 - Prerequisites](labs/0-prereqs.md) | 15 min | Verify prerequisites, run the app, and prepare browser tests. |
 | [1 - Understand the inherited application](docs/1-requirements.md) | 15 min | Source-grounded data flow and architecture diagram. |
 | [2 - Fix the bug from start to finish](docs/2-implementation.md) | 35 min | Interactive -> Plan -> bounded execution, with regression evidence. |
 | [3 - Code, security, and accessibility review](docs/3-security-review.md) | 25 min | Review decisions backed by evidence, using supplied specialist roles. |
 | [4 - Build confidence with tests](labs/4-testing.md) | 35 min | Standalone contract-first unit, integration, and browser testing, with a short accessibility check. |
 | [5 - Retrospective and operational reuse](docs/5-retrospective.md) | 10 min | Handoff and reusable prompting/verification habits. |
 
-Modules 1-5 total **120 minutes**, excluding the unchanged 15-minute prerequisite
+Modules 1-5 total **120 minutes**, excluding the 15-minute prerequisite
 module. Each module has Objective, Why it matters, numbered Tasks, Checkpoint,
 and Retrospective sections.
 
@@ -47,8 +47,7 @@ Use the **Copilot** harness/session target and **Agent mode** controls:
 
 Permissions are separate from Autopilot. Interactive is not inherently read-only:
 investigation prompts explicitly prohibit edits. Other harnesses can have different
-controls. Module 0 is intentionally unchanged; where its older mode wording
-differs, follow the current controls described here and in Module 1.
+controls. Module 0 verifies these controls before the guided exercises.
 
 For accessibility, the supplied helper is based on WCAG 2.1 AA. This workshop
 also checks selected WCAG 2.2 AA items; neither is a full conformance review.
@@ -60,10 +59,11 @@ recommended), PowerShell 5.1+ or 7, and package-feed access ready.
 From repository root:
 
 ```powershell
-npm.cmd --prefix .\client ci
-npm.cmd --prefix .\client test
-npm.cmd --prefix .\client run build
-npm.cmd --prefix .\client run dev
+cd client
+npm ci
+npm test
+npm run build
+npm run dev
 ```
 
 Open [http://127.0.0.1:5173](http://127.0.0.1:5173).
@@ -73,18 +73,18 @@ restores bundled synthetic records. Stop the app with **Ctrl+C**.
 
 The [setup](scripts/setup-env.ps1), [tests](scripts/run-tests.ps1), and
 [start](scripts/start-app.ps1) PowerShell wrappers remain available.
-If execution policy blocks a script, use the direct `npm.cmd` commands;
-do not weaken machine-wide policy.
+If execution policy blocks a script, use the direct commands above. If
+PowerShell blocks `npm.ps1` or `npx.ps1`, open a Command Prompt terminal at
+the repository root and run the same commands; do not weaken machine-wide policy.
 
 ### Browser testing - prepare before Module 4
 
-After `npm ci`, install Chromium once:
+After `npm ci`, open a second terminal at repository root and install Chromium once:
 
 ```powershell
-Push-Location .\client
-npx.cmd playwright install chromium
-Pop-Location
-npm.cmd --prefix .\client run test:e2e
+cd client
+npx playwright install chromium
+npm run test:e2e
 ```
 
 Playwright manages a separate Vite server on **127.0.0.1:5174** and isolated browser
@@ -92,8 +92,8 @@ contexts. It does not reuse the manual app's stored records. Ports 5173/5174
 must be available for their respective workflows.
 
 ```powershell
-npm.cmd --prefix .\client run test:a11y
-npm.cmd --prefix .\client run test:e2e:report
+npm run test:a11y
+npm run test:e2e:report
 ```
 
 The report viewer runs until **Ctrl+C**. Browser downloads may require approved

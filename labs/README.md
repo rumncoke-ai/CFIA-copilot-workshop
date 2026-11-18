@@ -22,15 +22,15 @@ Retrospective. Paste one prompt at a time and inspect the result before continui
 
 | Module | Suggested duration | Observable checkpoint |
 | --- | --- | --- |
-| [0 - Prerequisites](0-prereqs.md) | 15 min | Existing setup and orientation; unchanged. |
+| [0 - Prerequisites](0-prereqs.md) | 15 min | Verify prerequisites, run the app, and prepare browser tests. |
 | [1 - Understand the application](1-requirements.md) | 15 min | Explain real data flow and verify an architecture diagram. |
 | [2 - Fix the bug](2-implementation.md) | 35 min | Reproduce -> plan -> failing test -> bounded fix -> passing test. |
 | [3 - Review](3-security-review.md) | 25 min | Decide accept/modify/reject/investigate using code, security, and accessibility evidence. |
 | [4 - Test](4-testing.md) | 35 min | Create a small contract, then establish unit, integration, and browser evidence. Standalone; includes a short accessibility check. |
 | [5 - Retrospective](5-retrospective.md) | 10 min | Evidence-based handoff and reusable habits. |
 
-Modules 1-5 total **120 minutes**; prerequisites are separate. Module 0 retains
-older mode wording by request: use the current workflow controls above.
+Modules 1-5 total **120 minutes**; prerequisites are separate. Module 0
+checks the current workflow controls above.
 Prepare browser tooling before Module 4 when attending the full workshop.
 Standalone participants can use Module 4's setup instructions.
 
