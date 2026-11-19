@@ -1,7 +1,7 @@
 # Prompt playbook - Guided maintenance
 
 Use one prompt at a time with real source context and synthetic data.
-The [module guides](../docs/README.md) contain the full step-by-step workflow.
+The [workshop overview](../README.md) links to the full step-by-step modules.
 These templates are reusable summaries, not permission to skip checkpoints.
 
 ## 1. Understand before editing - Interactive
@@ -81,7 +81,7 @@ known gap rather than repeating Module 2.
 
 ## Participant notes
 
-Complete during [Module 5](../docs/5-retrospective.md).
+Complete during [Module 5](../labs/5-retrospective.md).
 
 | Pattern | Exact prompt used | Tracker evidence | Next-project application |
 | --- | --- | --- | --- |

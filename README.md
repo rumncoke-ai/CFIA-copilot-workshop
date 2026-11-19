@@ -28,7 +28,7 @@ production controls.
 | --- | --- | --- |
 | [0 - Prerequisites](labs/0-prereqs.md) | 15 min | Verify prerequisites, run the app, and prepare browser tests. |
 | [1 - Understand the inherited application](labs/1-requirements.md) | 15 min | Source-grounded data flow and architecture diagram. |
-| [2 - Fix the bug from start to finish](labs/2-implementation.md) | 35 min | Interactive -> Plan -> bounded execution, with regression evidence. |
+| [2 - Fix the bug from start to finish](labs/2-implementation.md) | 35 min | Investigate -> plan -> bounded implementation, with regression evidence. |
 | [3 - Code, security, and accessibility review](labs/3-security-review.md) | 25 min | Review decisions backed by evidence, using supplied specialist roles. |
 | [4 - Build confidence with tests](labs/4-testing.md) | 35 min | Standalone contract-first unit, integration, and browser testing, with a short accessibility check. |
 | [5 - Retrospective and operational reuse](labs/5-retrospective.md) | 10 min | Handoff and reusable prompting/verification habits. |
@@ -59,11 +59,11 @@ recommended), PowerShell 5.1+ or 7, and package-feed access ready.
 From repository root:
 
 ```powershell
-cd client
-npm ci
-npm test
-npm run build
-npm run dev
+Set-Location .\client
+npm.cmd ci
+npm.cmd test
+npm.cmd run build
+npm.cmd run dev
 ```
 
 Open [http://127.0.0.1:5173](http://127.0.0.1:5173).
@@ -74,17 +74,18 @@ restores bundled synthetic records. Stop the app with **Ctrl+C**.
 The [setup](scripts/setup-env.ps1), [tests](scripts/run-tests.ps1), and
 [start](scripts/start-app.ps1) PowerShell wrappers remain available.
 If execution policy blocks a script, use the direct commands above. If
-PowerShell blocks `npm.ps1` or `npx.ps1`, open a Command Prompt terminal at
-the repository root and run the same commands; do not weaken machine-wide policy.
+PowerShell blocks `npm.ps1` or `npx.ps1`, use the `.cmd` commands shown here;
+if organizational policy still blocks them, ask the facilitator. Do not weaken policy.
 
-### Browser testing - prepare before Module 4
+### Browser testing - preferred path, prepare before Module 4
 
-After `npm ci`, open a second terminal at repository root and install Chromium once:
+After dependency installation, open a second terminal at repository root.
+Only if permitted, install Chromium once and run the browser checks:
 
 ```powershell
-cd client
-npx playwright install chromium
-npm run test:e2e
+Set-Location .\client
+npx.cmd playwright install chromium
+npm.cmd run test:e2e
 ```
 
 Playwright manages a separate Vite server on **127.0.0.1:5174** and isolated browser
@@ -92,12 +93,17 @@ contexts. It does not reuse the manual app's stored records. Ports 5173/5174
 must be available for their respective workflows.
 
 ```powershell
-npm run test:a11y
-npm run test:e2e:report
+npm.cmd run test:a11y
+npm.cmd run test:e2e:report
 ```
 
 The report viewer runs until **Ctrl+C**. Browser downloads may require approved
 network access; see [facilitator preparation](instructor/facilitator-guide.md).
+If downloads or automation are prohibited or unavailable, use Module 4's
+[restricted-environment alternative](labs/4-testing.md#restricted-environment-alternative).
+Unit/integration tests plus documented manual browser checks let you continue,
+but do not replace automated E2E or axe evidence. MCP servers and custom agents
+are optional; Module 3 supplies chat-only review prompts. Never bypass policy.
 The supplied browser tests cover existing valid behavior and a baseline axe
 scan. Module 4 works without earlier modules: participants create a small test
 contract and add missing coverage, with accessibility inside the browser exercise.

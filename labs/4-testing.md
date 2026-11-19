@@ -25,6 +25,11 @@ More tests are not automatically better tests.
 
 The app is a React inspection findings tracker with browser localStorage.
 There is no backend or API to configure. Use synthetic data only.
+**Preferred path:** complete A-D, including Playwright and axe.
+**Restricted path:** complete A-C, then the
+[restricted-environment alternative](#restricted-environment-alternative)
+instead of D's automated browser steps. The learning objectives remain contract
+design, layered evidence, and honest coverage reporting, not tool installation.
 
 ## 3. Tasks
 
@@ -144,9 +149,20 @@ npm.cmd --prefix .\client run test:e2e
    Playwright starts and stops its own server on **127.0.0.1:5174**.
    Browser contexts have separate storage from your manual app.
    If that port is occupied, identify the owner; do not reuse an unknown server.
-   To rerun only accessibility checks, use
-   `npm.cmd --prefix .\client run test:a11y`.
-4. For a short manual check, run `npm.cmd --prefix .\client run dev`, open
+   To rerun only accessibility checks (repository root):
+
+```powershell
+npm.cmd --prefix .\client run test:a11y
+```
+
+4. For a short manual check, start the app from repository root in an idle
+   terminal (reuse an already-running workshop app rather than start another):
+
+```powershell
+npm.cmd --prefix .\client run dev
+```
+
+   Open
    [the app](http://127.0.0.1:5173), and use Tab/Shift+Tab to reach the fields and
    save button. Check visible focus and keyboard operation with synthetic data.
    Stop the server with **Ctrl+C**. Mark this check unverified if not performed.
@@ -158,6 +174,59 @@ npm.cmd --prefix .\client run test:e2e
    needed, review it separately and rerun affected checks; do not silently
    expand this exercise into application repairs.
 
+### Restricted-environment alternative
+
+Use this route if browser downloads, Playwright execution, or automation are
+prohibited or unavailable. Record the policy restriction or exact error; do not
+attempt prohibited installs, change proxy/security settings, or add packages.
+MCP is not required for any test runner here. With MCP unavailable, run commands
+yourself in the terminal and supply actual results to Chat. With custom agents
+unavailable, use the [Module 3 chat prompts](3-security-review.md).
+
+1. Keep A-C's unit and jsdom integration work and all existing browser files.
+   Run these checks from repository root:
+
+```powershell
+npm.cmd --prefix .\client test
+npm.cmd --prefix .\client run build
+```
+
+2. Leave automated browser/axe checks marked **not run - restricted environment**.
+   Do not report them passing because unit/integration tests pass. If useful,
+   discuss the proposed browser assertions in Chat without claiming execution.
+3. Use the existing manual app on **http://127.0.0.1:5173** in an approved
+   available browser such as Edge. If not running, start it in a separate
+   terminal from repository root:
+
+```powershell
+npm.cmd --prefix .\client run dev
+```
+
+4. Use only synthetic records and the same address/profile for reload checks.
+   In the existing `labs/04-test-plan.md`, record **requirement ID, method
+   (manual), steps/input, expected result, actual result, pass/fail/not run,
+   browser/version, and remaining gap** for each case:
+
+   | Manual case | Expected result |
+   | --- | --- |
+   | Save `  Demo Facility  ` with `INS-001`, `Routine`, `High`, and synthetic notes | `Demo Facility`, **80 / Prioritize immediate review**, list updated, form cleared on success. |
+   | Save a low or medium finding from the contract | Literal **20 / Routine follow-up** or **50 / Schedule follow-up inspection**. |
+   | Reload the page at the same address | Saved records remain. This is a real reload, not a component remount. |
+   | Cancel reset, then confirm reset | Cancel preserves records; confirmation leaves only the bundled seed. Confirm only after recording earlier evidence. |
+   | Try an empty required facility, then correct and save | Native validation prevents save; a valid correction saves. If Module 2 is complete, also check spaces-only rejection, associated feedback, retained inputs, and successful retry. Otherwise record the known spaces-only defect; do not fix it here. |
+   | Tab/Shift+Tab through form, submit, and reset | Meaningful names, logical navigation, visible/unobscured focus, operable controls, and discoverable feedback; record observations, not assumptions. |
+
+   Keep storage-failure/retry evidence from integration tests separate: an empty
+   field's native validation does not prove service-error handling.
+5. Update the same plan with actual automated test counts and manual outcomes.
+   Label this **restricted-path checkpoint complete, automated browser/axe
+   checkpoint unverified**. Manual browser verification is **not automated E2E**,
+   is less repeatable, and does not provide the automated axe rule scan, isolated
+   Chromium contexts, or traces. Screen-reader, mobile, and full WCAG checks
+   remain unverified unless separately performed. If even local browser access
+   is blocked, record manual checks not run and ask the facilitator for assistance;
+   the runtime checkpoint is then incomplete, not a claimed pass.
+
 ## 4. Checkpoint
 
 - One reviewed contract maps requirement IDs to existing and added evidence.
@@ -166,6 +235,9 @@ npm.cmd --prefix .\client run test:e2e
 - Accessibility includes a scoped axe check and an honest keyboard-check result.
 - Known defects and unperformed checks are visible. A passing axe scan is not
   full accessibility conformance, and no browser result is claimed without a run.
+- Restricted path: unit/integration results plus expected-versus-actual manual
+  evidence replace the activity, **not** the automated browser/axe coverage.
+  Identify the selected path and its remaining gaps explicitly.
 
 ## 5. Retrospective
 

@@ -11,8 +11,8 @@ Use synthetic data; scoring is not official CFIA policy.
 | Module | Suggested duration | Transition/checkpoint |
 | --- | --- | --- |
 | 0 | 15 min, separate | Verify prerequisites, run the app, and prepare browser tests. |
-| 1 | 15 min | Interactive explanation verified against source. |
-| 2 | 35 min | Interactive -> Plan -> regression failure -> bounded Autopilot fix -> human verification. |
+| 1 | 15 min | Investigation explanation verified against source. |
+| 2 | 35 min | Investigate -> plan -> regression failure -> bounded implementation -> human verification. |
 | 3 | 25 min | Dedicated code review plus specialist security/accessibility review decisions. |
 | 4 | 35 min | Standalone contract -> unit -> integration -> browser, including a short accessibility check. |
 | 5 | 10 min | Handoff and reusable prompting/verification habits. |
@@ -31,8 +31,9 @@ Protect checkpoints rather than rushing through unverified output.
 - Confirm the intentionally unfixed starter accepts whitespace-only facility names.
 - Run existing tests and build. Verify assertions, not a target test count.
 - Rehearse Modules 1-4 in a separate working copy. Do not solve the distributed
-  starter. Prepare reviewed recovery notes/checkpoints yourself; no reference
-  application solution or automated rescue patch is supplied.
+  starter. Rehearse the [instructor recovery checkpoints](recovery/README.md)
+  in an isolated worktree; keep the answer patches out of participant exercises.
+  Git and approved package access/cache are needed for that recovery route.
 - Keep each module's required headings and one-prompt-at-a-time rhythm.
 
 ## Browser-test preparation
@@ -49,10 +50,16 @@ npm.cmd --prefix .\client run build
 ```
 
 Prepare browser downloads using the approved organizational network/cache.
-Do not weaken security policy. Pre-provision Chromium for workshop delivery;
+Do not weaken security policy. Pre-provision Chromium where permitted;
 standalone participants follow Module 4's setup. If it cannot be provisioned,
-resolve access before browser exercises;
-a manual browser check is not equivalent to the core automated E2E checkpoint.
+use Module 4's [restricted-environment alternative](../labs/4-testing.md#restricted-environment-alternative).
+Retain unit/integration tests and document expected-versus-actual manual results
+in an approved available browser. This supports continued learning, but leaves
+automated browser/axe coverage unverified; manual checks are not equivalent E2E.
+Do not require retries of prohibited downloads or installation of alternate tools.
+MCP is optional and not used by the app or test runners; terminal execution and
+attached source/results replace agent-tool access when necessary. Package feeds
+and authorized Copilot service access still need advance confirmation.
 
 Playwright owns a Vite server on **127.0.0.1:5174**, refuses unknown existing
 servers, and stops its managed server afterward. The manual app remains on
@@ -71,12 +78,17 @@ Ctrl+C. Inspect axe JSON and retained failure traces rather than guessing causes
 
 ## Agent picker preparation
 
-1. In Chat, click the agent selector at the top and confirm the security and
-   accessibility specialists appear.
-2. Ask attendees to choose the named specialist for each review. If they can't
-   find it, select **Agent** mode and paste the prompt provided in the lab.
-3. Before allowing a specialist to write a report or plan, review the proposed
-   file path. Keep outputs local and use synthetic data.
+1. In Chat's agent selector, if available, confirm **security-expert** and
+   **Accessibility Expert** appear from this repository, not a same-named
+   personal/organization agent. Neither pins a model or requires MCP.
+2. Verify each agent's effective tools are read/search only. Tool aliases and
+   enforcement vary by harness/version; inspect the live tool list before use.
+   If broader tools appear or aliases fail, use ordinary investigation Chat,
+   attach source, paste Module 3's complete prompt, and decline mutating tools.
+3. Specialists return findings in Chat only, with location, evidence, severity,
+   remediation, and suggested verification. They cannot run checks or apply
+   corrections. Participants execute checks and authorize implementation
+   separately. No automatic report/plan files, installations, or web requests.
 4. Explain that accessibility results are checks, not a full conformance claim.
 
 Model/picker/tool behavior requires live verification in the delivery environment.
@@ -127,6 +139,8 @@ Reuse the preconfigured browser runner for valid save/reload journeys and retain
 reset coverage. Finish with a saved-state axe scan and short manual keyboard
 check, not another specialist workflow. Report actual results and unverified gaps;
 coverage percentages are unavailable unless separately configured.
+On the restricted route, use the manual cases in Module 4 instead of generating
+or claiming unrun automated browser checks. Both routes use the same test plan.
 
 ### Module 5 - Reflect
 
@@ -141,7 +155,9 @@ and rerun that check without weakening its assertion.
 For port conflicts, identify ownership; never kill processes by name.
 For unavailable Copilot features, use an explicitly labelled supported fallback.
 If browser automation is blocked, record the missing core checkpoint and resolve
-the prerequisite rather than claiming completion.
+it when permitted, or use the labelled restricted route without claiming
+automated coverage. For participants who need to rejoin, use the
+[five instructor checkpoints](recovery/README.md); never overwrite their work.
 
 ## Reference material
 

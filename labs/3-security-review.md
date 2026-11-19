@@ -64,8 +64,8 @@ invent remote attacks, authentication, APIs, or tamper-proof browser storage.
 Do not edit code; propose fixes for review. Report checks only if performed.
 ```
 
-3. The specialist may offer to write a report. Review the proposed file before
-   allowing a write; keep any report local.
+3. Keep the findings in Chat or your own notes. If a specialist offers edits,
+   commands, or a report file, decline and restate the read-only scope.
 4. Do not describe ignored extra fields as successful score overrides, or local
    user edits as proof of a remote exploit. No backend/authentication is in scope.
 
@@ -107,8 +107,8 @@ Stop after findings and the plan.
 
 2. Return to the standard agent in **Interactive**. Approve only confirmed,
    in-scope corrections. Add a focused regression for each accepted defect.
-3. Inspect application diffs separately from generated reports. Keep report
-   outputs local; ignored report paths do not appear in normal Source Control.
+3. Inspect application diffs against the review decisions in Chat or your own
+   notes. No generated report files are required.
 4. Rerun affected tests and build. If no actionable issues were found, record
    that result and remaining gaps rather than inventing a repair.
 
@@ -117,7 +117,7 @@ Stop after findings and the plan.
 - Distinguish dedicated code review, specialist review, and chat fallback.
 - Show each finding's evidence, disposition, and verified correction if accepted.
 - Explain what you reviewed and what you did not verify.
-- Separate WCAG 2.1 agent guidance from the workshop's scoped 2.2 AA target.
+- Identify relevant WCAG 2.1 guidance and selected 2.2 AA checks, not a full audit.
 - Make no blanket security or accessibility-conformance claim.
 
 ## 5. Retrospective
