@@ -3,7 +3,7 @@
 ## Session contract
 
 Participants inherit the React tracker, investigate whitespace-only facility
-names, implement one bounded fix, review it, and establish test evidence.
+names, implement one bounded fix, establish test evidence, and review it.
 Use synthetic data; scoring is not official CFIA policy.
 
 **Copilot proposes; humans approve; checks provide evidence.**
@@ -13,8 +13,8 @@ Use synthetic data; scoring is not official CFIA policy.
 | 0 | 15 min, separate | Verify prerequisites, run the app, and prepare browser tests. |
 | 1 | 15 min | Investigation explanation verified against source. |
 | 2 | 35 min | Investigate -> plan -> regression failure -> bounded implementation -> human verification. |
-| 3 | 25 min | Dedicated code review plus specialist security/accessibility review decisions. |
-| 4 | 35 min | Standalone contract -> unit -> integration -> browser, including a short accessibility check. |
+| 3 | 35 min | Standalone contract -> unit -> integration -> browser, including a short accessibility check. |
+| 4 | 25 min | Dedicated code review plus specialist security/accessibility review decisions. |
 | 5 | 10 min | Handoff and reusable prompting/verification habits. |
 
 Modules 1-5 total **120 minutes**. Including the separate 15-minute prerequisite
@@ -51,8 +51,8 @@ npm.cmd --prefix .\client run build
 
 Prepare browser downloads using the approved organizational network/cache.
 Do not weaken security policy. Pre-provision Chromium where permitted;
-standalone participants follow Module 4's setup. If it cannot be provisioned,
-use Module 4's [restricted-environment alternative](../labs/4-testing.md#restricted-environment-alternative).
+standalone participants follow Module 3's setup. If it cannot be provisioned,
+use Module 3's [restricted-environment alternative](../labs/3-testing.md#restricted-environment-alternative).
 Retain unit/integration tests and document expected-versus-actual manual results
 in an approved available browser. This supports continued learning, but leaves
 automated browser/axe coverage unverified; manual checks are not equivalent E2E.
@@ -67,7 +67,7 @@ servers, and stops its managed server afterward. The manual app remains on
 and build/typecheck includes browser-test/config types.
 
 The supplied two browser cases establish existing valid save/reload/reset
-behavior and an initial-page axe scan. Module 4 starts with a fresh behavior
+behavior and an initial-page axe scan. Module 3 starts with a fresh behavior
 contract and adds missing coverage, not another whitespace regression.
 It works on the unfixed starter or an attendee's already-fixed app.
 The accessibility command matches test paths containing `accessibility`; keep
@@ -84,7 +84,7 @@ Ctrl+C. Inspect axe JSON and retained failure traces rather than guessing causes
 2. Verify each agent's effective tools are read/search only. Tool aliases and
    enforcement vary by harness/version; inspect the live tool list before use.
    If broader tools appear or aliases fail, use ordinary investigation Chat,
-   attach source, paste Module 3's complete prompt, and decline mutating tools.
+   attach source, paste Module 4's complete prompt, and decline mutating tools.
 3. Specialists return findings in Chat only, with location, evidence, severity,
    remediation, and suggested verification. They cannot run checks or apply
    corrections. Participants execute checks and authorize implementation
@@ -115,7 +115,22 @@ An import/syntax failure is not proof of the bug. Autopilot implements only the
 approved correction; inspect the diff and retry workflow afterward.
 Keep unrelated full-field limits, unknown-key rejection, and load-state fixes out.
 
-### Module 3 - Review
+### Module 3 - Test
+
+Use [Module 3](../labs/3-testing.md) independently of Modules 1-2 and 4.
+Participants create `labs/03-test-plan.md` with a small contract and requirement
+mapping, then add missing unit, integration, and browser coverage. Existing tests
+already cover much of the behavior; do not reward duplicate tests or test counts.
+Use literal expected score/action outputs and real form/service integration.
+Keep the whitespace defect as a known gap if present; preserve earlier fixes.
+Reuse the preconfigured browser runner for valid save/reload journeys and retain
+reset coverage. Finish with a saved-state axe scan and short manual keyboard
+check, not another specialist workflow. Report actual results and unverified gaps;
+coverage percentages are unavailable unless separately configured.
+On the restricted route, use the manual cases in Module 3 instead of generating
+or claiming unrun automated browser checks. Both routes use the same test plan.
+
+### Module 4 - Review
 
 Review the actual change and necessary callers. Distinguish the dedicated local
 review action from a chat review fallback. Use accept/modify/reject/investigate.
@@ -126,21 +141,6 @@ Review security in the browser-only context; ignored fields do not demonstrate
 successful score override. Review accessibility across initial/error/corrected
 states and separate automated evidence from manual evaluation.
 GitHub PR review is not required and is not the same surface as custom agents.
-
-### Module 4 - Test
-
-Use [Module 4](../labs/4-testing.md) independently of Modules 1-3.
-Participants create `labs/04-test-plan.md` with a small contract and requirement
-mapping, then add missing unit, integration, and browser coverage. Existing tests
-already cover much of the behavior; do not reward duplicate tests or test counts.
-Use literal expected score/action outputs and real form/service integration.
-Keep the whitespace defect as a known gap if present; preserve earlier fixes.
-Reuse the preconfigured browser runner for valid save/reload journeys and retain
-reset coverage. Finish with a saved-state axe scan and short manual keyboard
-check, not another specialist workflow. Report actual results and unverified gaps;
-coverage percentages are unavailable unless separately configured.
-On the restricted route, use the manual cases in Module 4 instead of generating
-or claiming unrun automated browser checks. Both routes use the same test plan.
 
 ### Module 5 - Reflect
 

@@ -55,7 +55,7 @@ safe behavior, and accepted limitations. No findings is a valid result.
 
 Use dedicated local code review where available. For security or accessibility
 review, choose the specialist from Chat's agent selector. If you can't find it,
-choose **Agent** mode and use the review instructions in Module 3. Review
+choose **Agent** mode and use the review instructions in Module 4. Review
 any proposed report file before allowing it to be written.
 
 ## 5. Test against the contract
@@ -76,7 +76,7 @@ or call passing axe checks full accessibility conformance.
 
 Tracker example: literal severity scores -> form/service save -> browser reload,
 with a short axe/keyboard check. See the standalone
-[Module 4](../labs/4-testing.md); record the intentional whitespace defect as a
+[Module 3](../labs/3-testing.md); record the intentional whitespace defect as a
 known gap rather than repeating Module 2.
 
 ## Participant notes

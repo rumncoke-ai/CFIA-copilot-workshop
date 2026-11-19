@@ -4,14 +4,33 @@
 
 **Suggested duration: 35 minutes.**
 
-In this module, we'll explore a reported bug and use Copilot to understand why
-it happens. We'll plan a fix, add a test that catches the problem, and then make
-the change. Finally, we'll try the updated app and run the tests to check that
-the fix works. You'll finish with a working fix and a test to help catch the
-same bug if it returns.
+In this module, we'll take on a bug report for the Inspection Findings Tracker
+as developers responsible for maintaining the application. We'll use GitHub
+Copilot to investigate the issue, understand its cause, and make a reliable fix.
+We'll:
 
-> An inspector lead reports that a facility name containing only spaces can be
-> saved. It produces a finding without a usable facility name.
+1. Reproduce the reported bug and investigate its root cause.
+2. Develop and review an implementation plan.
+3. Add a regression test that demonstrates the issue.
+4. Implement a targeted fix with Copilot.
+5. Verify that the fix works without breaking existing functionality.
+
+We'll finish with a resolved issue and a regression test to help prevent the
+same bug from returning.
+
+
+> **Bug Report**
+>
+> **Reported by:** Inspector Lead
+>
+> **Issue:** The application allows a finding to be saved when the facility name
+> contains only spaces.
+>
+> **Impact:** The finding has no usable facility name, making it difficult to
+> identify which facility needs follow-up.
+>
+> **Expected behavior:** Facility names containing only whitespace should be
+> rejected, while valid facility names should continue to work normally.
 
 ## 2. Why it matters
 
@@ -21,19 +40,46 @@ inspection policy or approve its own changes.
 
 ## 3. Tasks
 
-### A. Reproduce and understand
+### A. Reproduce and understand the bug
 
-1. Confirm **Interactive** in the Copilot Agent mode picker.
-2. In the browser, enter synthetic values for all fields, but enter three spaces
-   for **Facility name**. Select **High**, then **Save finding**.
-3. Observe the saved result/list and browser storage. The starter trims the
-   spaces to an empty name but still saves it; do not claim it rejected the input.
-4. Attach these files to Chat (paths start at the repository root):
+Before making changes, we'll reproduce the inspector lead's report and use
+Copilot to understand why the application accepts an invalid facility name.
+
+#### Step 1: Reproduce the issue
+
+1. Make sure the Inspection Findings Tracker is running in the browser.
+2. Enter this synthetic finding:
+
+   | Field | Value |
+   | --- | --- |
+   | Inspector ID | `INS-1042` |
+   | Facility name | Three spaces (see below) |
+   | Inspection type | `Routine` |
+   | Severity | `High` |
+   | Notes | `Testing facility-name validation` |
+
+   **Important:** For **Facility name**, press the spacebar exactly three times.
+   Do not enter the words "Three spaces."
+
+3. Select **Save finding**.
+4. Observe the result and check the saved findings list and browser storage.
+
+**Expected behavior:** The application should reject a whitespace-only facility
+name.
+
+**Actual starter behavior:** The application trims the spaces to an empty name
+but still saves the finding.
+
+#### Step 2: Investigate using Copilot
+
+1. Open GitHub Copilot Chat and confirm **Interactive** is selected in the
+   **Agent mode** picker.
+2. Attach these files to Chat (paths start at the repository root):
    - [client/src/FindingForm.tsx](../client/src/FindingForm.tsx)
    - [client/src/App.tsx](../client/src/App.tsx)
    - [client/src/findings.ts](../client/src/findings.ts)
 
-   Then paste:
+3. Paste this prompt:
 
 ```text
 Do not edit. Bug: a facility name containing three spaces saves successfully.
@@ -44,14 +90,31 @@ Propose no unrelated fixes. Explain why a whitespace-only name should be rejecte
 and identify the safeguards already supplied.
 ```
 
-5. Review the expected behavior above. The only fix is rejecting whitespace-only
-   facility names. Normalization, storage safeguards, failed-save retention, and
-   accessible feedback are already supplied. Preserve internal spaces and Unicode,
-   other fields, scoring, duplicates, seed data, persistence, and confirmed reset.
+#### Step 3: Review the findings
 
-### B. Propose the fix
+Review Copilot's explanation against the source code. Identify:
 
-1. Select **Plan** in the Agent mode picker.
+1. Where facility-name validation occurs.
+2. Why the existing validation accepts whitespace-only values.
+3. How the invalid value reaches storage.
+4. Which existing safeguards need to stay in place.
+
+**Important:** We'll only fix whitespace-only facility names. Normalization,
+storage safeguards, failed-save retention, and accessible feedback are already
+supplied. Preserve internal spaces and Unicode, other fields, scoring,
+duplicates, seed data, persistence, and confirmed reset.
+
+**Checkpoint:** We should now be able to reproduce the issue, explain its cause,
+identify where the fix belongs, and describe which behaviors must stay unchanged.
+
+### B. Propose and review the fix
+
+Now that we've reproduced the bug and understood its cause, we'll use Copilot
+to plan a targeted fix and review its impact before changing the code.
+
+#### Step 1: Create an implementation plan
+
+1. Select **Plan** in the **Agent mode** picker.
 2. Attach these files to Chat (paths start at the repository root):
    - [client/src/FindingForm.tsx](../client/src/FindingForm.tsx)
    - [client/src/App.tsx](../client/src/App.tsx)
@@ -59,7 +122,7 @@ and identify the safeguards already supplied.
    - [client/src/findings.test.ts](../client/src/findings.test.ts)
    - [client/src/App.test.tsx](../client/src/App.test.tsx)
 
-   Then paste:
+3. Paste this prompt:
 
 ```text
 Plan the smallest fix for whitespace-only facility names. Do not edit application
@@ -72,22 +135,44 @@ Specify an expected failing regression and exact verification commands.
 Stop for human review.
 ```
 
-3. Inspect the proposed plan. Reject unrelated changes and unchecked casts.
-4. Approve the plan **without starting implementation**, when that action is
-   offered. Switch to **Interactive** for the test-first step. If labels differ,
-   use the available plan-review controls to finish review without authorizing
-   the full implementation yet.
+#### Step 2: Review the proposed plan
 
-### C. Establish the regression
+Before approving the plan, check:
+
+- Does it address the reported issue?
+- Does it reuse existing validation and error-handling mechanisms?
+- Does it preserve existing behavior apart from accepting whitespace-only names?
+- Does it include a regression test?
+- Does it avoid unrelated changes and unchecked casts?
+
+If Copilot proposes unnecessary changes, ask it to revise the plan.
+
+#### Step 3: Approve the plan
+
+1. Approve the plan **without starting implementation**, when that option is
+   available.
+2. Switch back to **Interactive** for the test-first step.
+
+If the interface uses different labels, use the available plan-review controls
+to finish review without authorizing the full implementation yet.
+
+**Checkpoint:** We should now have a reviewed plan covering the required change,
+the behavior to preserve, and the regression test. We won't implement the fix yet.
+
+### C. Create a failing regression test
 
 We're not fixing the code just yet. First, we'll add a test that catches the bug
 and watch it fail. This shows that the test can spot the problem before we fix it.
+
+#### What is a regression test?
 
 A **regression** is when a bug comes back or a change breaks something that used
 to work. A **regression test** helps catch that. Our test should fail now, pass
 after the fix, and warn us if a future change brings this bug back.
 
-1. Paste this bounded prompt:
+#### Step 1: Generate the regression test
+
+Paste this bounded prompt in Copilot Chat:
 
 ```text
 Implement only the planned service regression for whitespace-only facility_name
@@ -100,15 +185,31 @@ Run npm.cmd --prefix .\client test -- src\findings.test.ts from repository root.
 Stop after showing the failure and explain how it demonstrates the reported bug.
 ```
 
-2. Inspect the test and actual output. The failure must show acceptance where
-   rejection was expected, not a syntax error or missing dependency.
-3. Keep the failing test. Do not weaken it to match the starter.
+#### Step 2: Review the test results
 
-### D. Execute the approved correction
+Inspect the generated test and actual output. Confirm that:
+
+1. The test checks the expected behavior.
+2. It fails because the application accepts the invalid input.
+3. The failure isn't caused by a syntax error or missing dependency.
+4. The test checks that storage remains unchanged when invalid input is rejected.
+
+**Important:** Keep the failing test. Don't weaken it to match the starter.
+The failure is expected because we haven't fixed the application yet.
+
+**Checkpoint:** We should now have a failing regression test that demonstrates
+the reported issue and gives us a measurable way to check the fix.
+
+### D. Implement the approved fix
+
+We've reproduced the bug, reviewed the plan, and created a failing regression
+test. Now we'll use Copilot to make the correction and validate the results.
+
+#### Step 1: Implement using Copilot
 
 1. Review the selected **Permissions** separately. Do not select unrestricted
    permissions merely to demonstrate Autopilot.
-2. Select **Autopilot** and paste:
+2. Select **Autopilot** in Copilot Chat and paste:
 
 ```text
 Apply only the approved whitespace-only facility check.
@@ -121,32 +222,96 @@ actual results, and remaining gaps. Stop at this checkpoint.
 ```
 
 3. If organization policy disables Autopilot, execute the same approved task in
-   Interactive. Record that fallback; do not claim Autopilot was demonstrated.
+   **Interactive**. Record that fallback; do not claim Autopilot was demonstrated.
 
-### E. Inspect and demonstrate
+#### Step 2: Review Copilot's changes
 
-This final task is where you evaluate Copilot's work. Review its changes against
-the agreed criteria, then test the fix in the running app to confirm it behaves
-as expected.
+1. Open Source Control in VS Code.
+2. Review the modified files.
+3. Confirm that the changes match the approved plan.
+4. Check that no unrelated functionality was modified.
 
-1. Return to **Interactive** and inspect Source Control changes.
-2. Ask Copilot to explain the diff against the criteria without further edits.
-3. Try a whitespace-only facility name: confirm it’s rejected, the user gets feedback, their other inputs remain available to correct, and no finding or false success is produced.
-4. Save a valid name with surrounding spaces: verify it’s normalized to `Demo Facility`, the existing score/action remain correct, and the form clears only after a successful save.
-5. Reload: confirm the successfully saved finding persists.
+If needed, ask Copilot to explain the changes without making additional edits.
+
+#### Step 3: Verify automated test results
+
+Review the actual results reported by Copilot. Confirm that:
+
+- The regression test now passes.
+- The full existing Vitest suite passes.
+- The application builds successfully.
+- Any remaining issues or unperformed checks are clearly identified.
+
+**Checkpoint:** We should now have a targeted fix supported by passing automated
+checks. We'll verify the running application next.
+
+### E. Verify the fix in the running application
+
+This final task is where we'll evaluate the fix in the running app. We'll check
+that invalid input is rejected and valid findings still work as expected.
+
+#### Step 1: Verify invalid input is rejected
+
+1. Return to **Interactive** in Copilot Chat.
+2. Open the running application.
+3. Enter valid synthetic values for the other fields, keep **High** severity,
+   and enter only spaces for the facility name.
+4. Attempt to save the finding.
+
+Confirm that:
+
+- The invalid facility name is rejected.
+- The user receives feedback.
+- Other form inputs remain available for correction.
+- No invalid finding is saved.
+- No false success message appears.
+
+#### Step 2: Verify valid input still works
+
+1. Correct the facility name to `  Demo Facility  `, with two spaces before and
+   after the name.
+2. Save the finding.
+3. Confirm that:
+   - The finding is saved successfully.
+   - The facility name is normalized to `Demo Facility`.
+   - The score and action remain **80 / Prioritize immediate review**.
+   - The form clears only after a successful save.
+
+#### Step 3: Verify persistence
+
+1. Reload the browser at the same address.
+2. Locate the successfully saved finding.
+3. Confirm that its information remains available.
+
+#### Step 4: Review the final changes
+
+Ask Copilot to explain the final changes against the approved requirements
+without modifying any additional files.
+
+**Checkpoint:** We've checked the fix through a failing regression before
+implementation, passing automated checks afterward, and manual verification of
+invalid input, valid input, and persistence after reload.
 
 ## 4. Checkpoint
 
-- Demonstrate a relevant regression failing before and passing after the fix.
-- Reject blank facility names through both form and direct service calls.
-- Show normalized valid output, unchanged storage on rejection, and usable retry.
-- Preserve existing scoring, persistence, duplicates, and confirmed reset.
-- Inspect the bounded diff and record actual tests/build results.
+- Reproduce the original bug and explain its root cause using the source code.
+- Review and approve a targeted implementation plan.
+- Demonstrate a regression failing before and passing after the fix.
+- Reject whitespace-only facility names through both form and direct service calls.
+- Confirm storage remains unchanged when invalid input is rejected.
+- Verify that valid facility names are normalized correctly.
+- Confirm users can correct invalid input without losing other form values.
+- Preserve scoring, persistence, duplicates, seed data, and confirmed reset.
+- Review Copilot's changes and record actual test and build results.
 
 ## 5. Retrospective
 
-- What did Plan clarify that the bug report did not?
-- Where did you explicitly stop Autopilot?
-- What did the regression prove, and what still needs broader testing?
+Take a moment to reflect:
 
-**Next: [Module 3 - Code, security, and accessibility review](3-security-review.md).**
+1. How did Copilot help us investigate and understand the reported bug?
+2. Why was it useful to create a failing regression before implementing the fix?
+3. What did reviewing the implementation plan help us catch or clarify?
+4. Why should we verify Copilot-generated changes rather than rely only on
+   passing tests?
+
+**Next: [Module 3 - Build confidence with tests](3-testing.md).**

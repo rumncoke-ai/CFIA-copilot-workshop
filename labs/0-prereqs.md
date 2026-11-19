@@ -13,7 +13,7 @@ the code yet.
 | Windows PowerShell 5.1+ or PowerShell 7 | Open a PowerShell terminal in VS Code. |
 | [Git](https://git-scm.com/install/) if cloning the repository | `git --version` |
 | A current browser, such as Edge or Chrome | Confirm JavaScript and localStorage are allowed for the local app; use the same browser profile throughout. |
-| Chromium for Playwright (Module 4) | Install the test browser after npm dependencies, using the commands below. Your everyday browser does not replace this download. |
+| Chromium for Playwright (Module 3) | Install the test browser after npm dependencies, using the commands below. Your everyday browser does not replace this download. |
 
 You need approved network access for GitHub, npm packages, Copilot, and
 Playwright browser downloads for the full browser-testing path. If downloads
@@ -34,7 +34,7 @@ Set-Location .\CFIA-copilot-workshop
 In VS Code, use **File > Open Folder** to open the repository folder containing
 `client`, `labs`, and `scripts`, not just the `client` folder. Confirm Copilot's Copilot harness/session target and Interactive, Plan, and Autopilot controls are available.
 Missing Autopilot, MCP, custom agents, or dedicated review controls does not
-block the exercises. Module 3 supplies equivalent review prompts.
+block the exercises. Module 4 supplies equivalent review prompts.
 
 ## 2. Install dependencies and run the app
 
@@ -58,9 +58,9 @@ facilitator. Port **5173** must be available. If PowerShell blocks `npm.ps1`
 or `npx.ps1`, use the `.cmd` commands shown above. If those are also blocked,
 ask your facilitator; do not weaken execution policy.
 The [setup/start/test scripts](../scripts) are optional wrappers around these
-commands. Tests are preconfigured; Module 4 adds coverage, not tooling.
+commands. Tests are preconfigured; Module 3 adds coverage, not tooling.
 
-### Prepare browser tests before Module 4
+### Prepare browser tests before Module 3
 
 Leave the app terminal running and open a **second terminal at the repository
 root**. After dependency installation has completed, and only if permitted, run:
@@ -76,7 +76,7 @@ Playwright starts and stops its own app server on **127.0.0.1:5174** and uses
 isolated browser data, not your manual app's records. Resolve download or test
 failures with your facilitator; do not bypass organizational policies or retry
 prohibited downloads. If unavailable, record the restriction/error and follow
-Module 4's [restricted-environment alternative](4-testing.md#restricted-environment-alternative):
+Module 3's [restricted-environment alternative](3-testing.md#restricted-environment-alternative):
 keep unit/integration tests, use an approved browser manually, and record
 expected-versus-actual results. Manual checks are not automated browser tests;
 E2E and axe coverage remain unverified. No new packages are needed.
@@ -118,17 +118,21 @@ and select **Interactive** in the **Agent mode** picker. Keep the workshop
 repository open so Copilot can use it as context, then paste:
 
 ```text
-Explore this repository and explain the current Inspection Findings Tracker
-in plain language. Do not edit files or install anything.
+Explore this repository and give me a brief, beginner\-friendly overview.
 
-1. What does the application do, and how would an inspector use it?
-2. What technologies does this single React app use, and where are its main files?
-3. Trace a finding from the form through the local TypeScript data service to
-   its risk score and follow-up recommendation. Explain how the list is loaded.
-4. What are the current scoring rules, where is data stored, and what happens
-   on browser reload, dev-server restart, and confirmed demo reset?
+Do not edit any files or install anything.
 
-Keep the explanation short and reference the actual files and functions.
+Explain:
+
+1. What is the Inspection Findings Tracker, and what is its purpose?
+2. Who are the intended users, and what can they do with the application?
+3. What technologies and frameworks does the application use?
+4. How is the repository organized, and where are the main application files?
+5. How do I run the application locally?
+
+Keep your response concise, use simple language, and reference relevant files.
+
+Focus on understanding the repository at a high level. Do not analyze the application's detailed business logic, trace its technical data flow, or investigate potential issues.
 ```
 
 If Copilot needs more context, attach the [client/src](../client/src)

@@ -4,7 +4,7 @@ Inherit one working Inspection Findings Tracker and complete one guided
 maintenance story with GitHub Copilot.
 
 > An inspector lead reports that a facility name containing only spaces can be
-> saved. Understand the app, fix the bug, review the change, and prove it works.
+> saved. Understand the app, fix the bug, prove it works, and review the change.
 
 ## One app, one maintenance story
 
@@ -29,8 +29,8 @@ production controls.
 | [0 - Prerequisites](labs/0-prereqs.md) | 15 min | Verify prerequisites, run the app, and prepare browser tests. |
 | [1 - Understand the inherited application](labs/1-requirements.md) | 15 min | Source-grounded data flow and architecture diagram. |
 | [2 - Fix the bug from start to finish](labs/2-implementation.md) | 35 min | Investigate -> plan -> bounded implementation, with regression evidence. |
-| [3 - Code, security, and accessibility review](labs/3-security-review.md) | 25 min | Review decisions backed by evidence, using supplied specialist roles. |
-| [4 - Build confidence with tests](labs/4-testing.md) | 35 min | Standalone contract-first unit, integration, and browser testing, with a short accessibility check. |
+| [3 - Build confidence with tests](labs/3-testing.md) | 35 min | Standalone contract-first unit, integration, and browser testing, with a short accessibility check. |
+| [4 - Code, security, and accessibility review](labs/4-security-review.md) | 25 min | Review decisions backed by evidence, using supplied specialist roles. |
 | [5 - Retrospective and operational reuse](labs/5-retrospective.md) | 10 min | Handoff and reusable prompting/verification habits. |
 
 Modules 1-5 total **120 minutes**, excluding the 15-minute prerequisite
@@ -77,7 +77,7 @@ If execution policy blocks a script, use the direct commands above. If
 PowerShell blocks `npm.ps1` or `npx.ps1`, use the `.cmd` commands shown here;
 if organizational policy still blocks them, ask the facilitator. Do not weaken policy.
 
-### Browser testing - preferred path, prepare before Module 4
+### Browser testing - preferred path, prepare before Module 3
 
 After dependency installation, open a second terminal at repository root.
 Only if permitted, install Chromium once and run the browser checks:
@@ -99,13 +99,13 @@ npm.cmd run test:e2e:report
 
 The report viewer runs until **Ctrl+C**. Browser downloads may require approved
 network access; see [facilitator preparation](instructor/facilitator-guide.md).
-If downloads or automation are prohibited or unavailable, use Module 4's
-[restricted-environment alternative](labs/4-testing.md#restricted-environment-alternative).
+If downloads or automation are prohibited or unavailable, use Module 3's
+[restricted-environment alternative](labs/3-testing.md#restricted-environment-alternative).
 Unit/integration tests plus documented manual browser checks let you continue,
 but do not replace automated E2E or axe evidence. MCP servers and custom agents
-are optional; Module 3 supplies chat-only review prompts. Never bypass policy.
+are optional; Module 4 supplies chat-only review prompts. Never bypass policy.
 The supplied browser tests cover existing valid behavior and a baseline axe
-scan. Module 4 works without earlier modules: participants create a small test
+scan. Module 3 works without earlier modules: participants create a small test
 contract and add missing coverage, with accessibility inside the browser exercise.
 The intentional whitespace defect is a known gap, not a prerequisite repair.
 Vitest/jsdom tests are not browser E2E; an axe pass is not WCAG conformance.

@@ -136,7 +136,7 @@ git -C "$recovery" --no-pager diff -- client\src\findings.ts client\src\findings
 
 ## 5. Application ready for code, security, and accessibility review
 
-- **Use when:** the participant needs to enter Module 3 with a bounded review diff.
+- **Use when:** the participant needs to enter Module 4 with a bounded review diff.
 - **State:** same app/test patch set as checkpoint 4, with task E verified, not
   already reviewed or certified. Preserve the uncommitted diff for local review.
 - **Restore:** same commands as checkpoint 4 and shared tests/build. Start the
@@ -151,10 +151,10 @@ npm.cmd --prefix "$recovery\client" run dev
   entry. Correct to `  Demo Facility  ` and save: expect normalized name,
   **80 / Prioritize immediate review**, cleared form, and persistence on reload.
   Use keyboard navigation to observe feedback/focus. Stop with Ctrl+C when done.
-- **Resume:** Module 3 task A, then the read-only specialist or chat reviews.
+- **Resume:** Module 4 task A, then the read-only specialist or chat reviews.
 - **Human-only:** task E's visual/keyboard observations and actual readiness need
   live verification. Git/tests do not restore browser localStorage or UI evidence.
-  Module 4 still follows, on the full or restricted path.
+  Module 3 can be completed independently, on the full or restricted path.
 
 ## Handoff
 
@@ -162,4 +162,4 @@ Tell the learner which checkpoint was restored, what was actually run, and which
 manual checks remain. Reattach relevant files and the approved plan in a fresh
 Chat if needed. Keep original work for later comparison; do not commit/merge the
 recovery into their branch automatically. Any review-discovered corrections,
-Module 4 additions, browser state, and Chat history are not checkpoint contents.
+Module 3 additions, browser state, and Chat history are not checkpoint contents.
