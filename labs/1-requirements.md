@@ -21,11 +21,11 @@ You need to know where a change belongs and which existing behavior to preserve.
 
 ### A. Select the workflow and supply context
 
-1. Keep the repository open in VS Code and make sure the app is running.
+1. Open the repository folder in VS Code. Start the app using the repository's
+   setup instructions, and leave it running.
 2. In Chat, select the **Copilot** harness/session target. In its **Agent mode**
-   picker, select **Interactive**. These guides use **Interactive, Plan, and
-   Autopilot**, not the older Ask/Plan/Agent sequence.
-3. Attach these files to Chat (paths start at the repository root):
+   picker, select **Interactive**.
+3. (Optional) Attach these files to Chat:
    - [client/src/App.tsx](../client/src/App.tsx)
    - [client/src/FindingForm.tsx](../client/src/FindingForm.tsx)
    - [client/src/findings.ts](../client/src/findings.ts)
@@ -54,7 +54,7 @@ Do not invent an API, backend, AI scoring model, or official inspection policy.
 
 ### C. Locate the evidence
 
-1. Attach these test files to Chat (paths start at the repository root):
+1. (Optional) Attach these test files to Chat:
    - [client/src/risk.test.ts](../client/src/risk.test.ts)
    - [client/src/findings.test.ts](../client/src/findings.test.ts)
    - [client/src/App.test.tsx](../client/src/App.test.tsx)

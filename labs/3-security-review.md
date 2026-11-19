@@ -15,23 +15,16 @@ Neither replaces human judgment or proves production readiness.
 
 ## 3. Tasks
 
-### A. Prepare the review
+### A. Review correctness with the dedicated local review feature
 
 1. Keep your Module 2 changes available in Source Control.
-2. Confirm the expected behavior: reject whitespace-only facility names before
-   storage access, show the existing field feedback, retain inputs, and allow a
-   corrected name to save normally. The app uses synthetic data and browser
-   storage; scores and saved records can be changed by the user.
-
-### B. Review correctness with the dedicated local review feature
-
-1. Open **Source Control** and use the Copilot review action above **Changes**
-   for uncommitted changes, if available.
-2. Alternatively select relevant changed code and use **Chat: Review** from the
-   Command Palette when available. Selection review and diff review have
-   different scopes; check what was actually reviewed.
-3. Read each suggestion before applying it. If the dedicated UI is unavailable,
-   select **Interactive**, attach the diff, adjacent callers, and tests, then paste:
+2. Open **Source Control** and use the Copilot review action above **Changes**
+   for uncommitted changes, if available. Note what was reviewed.
+3. Run a separate chat-based review of the same, unchanged changes. Select
+   relevant changed code and use **Chat: Review** from the Command Palette when
+   available. Selection review and diff review have different scopes; note what
+   was actually reviewed. If **Chat: Review** is unavailable, select
+   **Interactive**, attach the diff, adjacent callers, and tests, then paste:
 
 ```text
 Review my whitespace-only facility fix. Blank names must be rejected before
@@ -45,10 +38,12 @@ actual behavior, impact, and focused verification. Say when evidence is missing.
 No findings is valid. Do not treat stylistic preferences as confirmed defects.
 ```
 
-4. Label this fallback **chat-based review**, not dedicated Copilot code review.
-   This exercise does not require a GitHub PR, commit, push, or remote reviewer.
+4. Compare the results and record which review produced each finding. Do not
+   apply suggestions or edit code during either review; keep the changes
+   unchanged until section D. This exercise does not require a GitHub PR,
+   commit, push, or remote reviewer.
 
-### C. Review security
+### B. Review security
 
 1. In Chat, click the agent selector at the top and choose **security-expert**.
    If you can't find it, choose **Agent** mode instead.
@@ -74,7 +69,7 @@ Do not edit code; propose fixes for review. Report checks only if performed.
 4. Do not describe ignored extra fields as successful score overrides, or local
    user edits as proof of a remote exploit. No backend/authentication is in scope.
 
-### D. Review accessibility
+### C. Review accessibility
 
 1. In Chat, click the agent selector at the top and choose **Accessibility Expert**.
    If you can't find it, choose **Agent** mode instead.
@@ -98,7 +93,7 @@ Stop after findings and the plan.
 4. Manually navigate and correct the form using the keyboard. Record screen-reader,
    zoom, contrast, and other checks as unverified unless actually performed.
 
-### E. Decide, then correct
+### D. Decide, then correct
 
 1. Record each suggestion, supporting evidence, and your decision in Chat or
    your own notes. Use this guide:

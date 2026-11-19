@@ -11,7 +11,7 @@ the code yet.
 | [VS Code](https://code.visualstudio.com/) with GitHub Copilot Chat access | Update VS Code and the GitHub Copilot extension, sign in with your authorized GitHub account, and confirm Chat is available under your organization's policy. |
 | [Node.js 22.12 or newer](https://nodejs.org/); Node.js 24 LTS recommended | `node --version` and `npm --version`; npm is included with Node.js. Restart the VS Code terminal after installation. |
 | Windows PowerShell 5.1+ or PowerShell 7 | Open a PowerShell terminal in VS Code. |
-| [Git](https://git-scm.com/downloads) if cloning the repository | `git --version` |
+| [Git](https://git-scm.com/install/) if cloning the repository | `git --version` |
 | A current browser, such as Edge or Chrome | Confirm JavaScript and localStorage are allowed for the local app; use the same browser profile throughout. |
 | Chromium for Playwright (Module 4) | Install the test browser after npm dependencies, using the commands below. Your everyday browser does not replace this download. |
 

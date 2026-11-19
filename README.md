@@ -27,11 +27,11 @@ production controls.
 | Module | Suggested duration | Outcome |
 | --- | --- | --- |
 | [0 - Prerequisites](labs/0-prereqs.md) | 15 min | Verify prerequisites, run the app, and prepare browser tests. |
-| [1 - Understand the inherited application](docs/1-requirements.md) | 15 min | Source-grounded data flow and architecture diagram. |
-| [2 - Fix the bug from start to finish](docs/2-implementation.md) | 35 min | Interactive -> Plan -> bounded execution, with regression evidence. |
-| [3 - Code, security, and accessibility review](docs/3-security-review.md) | 25 min | Review decisions backed by evidence, using supplied specialist roles. |
+| [1 - Understand the inherited application](labs/1-requirements.md) | 15 min | Source-grounded data flow and architecture diagram. |
+| [2 - Fix the bug from start to finish](labs/2-implementation.md) | 35 min | Interactive -> Plan -> bounded execution, with regression evidence. |
+| [3 - Code, security, and accessibility review](labs/3-security-review.md) | 25 min | Review decisions backed by evidence, using supplied specialist roles. |
 | [4 - Build confidence with tests](labs/4-testing.md) | 35 min | Standalone contract-first unit, integration, and browser testing, with a short accessibility check. |
-| [5 - Retrospective and operational reuse](docs/5-retrospective.md) | 10 min | Handoff and reusable prompting/verification habits. |
+| [5 - Retrospective and operational reuse](labs/5-retrospective.md) | 10 min | Handoff and reusable prompting/verification habits. |
 
 Modules 1-5 total **120 minutes**, excluding the 15-minute prerequisite
 module. Each module has Objective, Why it matters, numbered Tasks, Checkpoint,
@@ -104,4 +104,5 @@ contract and add missing coverage, with accessibility inside the browser exercis
 The intentional whitespace defect is a known gap, not a prerequisite repair.
 Vitest/jsdom tests are not browser E2E; an axe pass is not WCAG conformance.
 
-Start with the [participant overview](docs/README.md).
+This README is the participant overview. Start with
+[Module 0 - Prerequisites](labs/0-prereqs.md).

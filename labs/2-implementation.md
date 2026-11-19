@@ -125,14 +125,15 @@ actual results, and remaining gaps. Stop at this checkpoint.
 
 ### E. Inspect and demonstrate
 
+This final task is where you evaluate Copilot's work. Review its changes against
+the agreed criteria, then test the fix in the running app to confirm it behaves
+as expected.
+
 1. Return to **Interactive** and inspect Source Control changes.
 2. Ask Copilot to explain the diff against the criteria without further edits.
-3. Reject a whitespace-only facility. Check field feedback, retained inputs,
-   no new finding, and no success reported for that attempt.
-4. Correct it to `  Demo Facility  ` and save. Expect `Demo Facility`,
-   **80 / Prioritize immediate review**, and a cleared form after success.
-5. Reload and verify persistence. Keep the actual test results and browser
-   observations in Chat or your own notes.
+3. Try a whitespace-only facility name: confirm it’s rejected, the user gets feedback, their other inputs remain available to correct, and no finding or false success is produced.
+4. Save a valid name with surrounding spaces: verify it’s normalized to `Demo Facility`, the existing score/action remain correct, and the form clears only after a successful save.
+5. Reload: confirm the successfully saved finding persists.
 
 ## 4. Checkpoint
 
