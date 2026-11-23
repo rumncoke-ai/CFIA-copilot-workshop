@@ -141,9 +141,12 @@ what to do rather than automatically accept Copilot's recommendation.
 ## 4. Checkpoint
 
 - Distinguish dedicated code review, specialist review, and chat fallback.
-- Show each finding's evidence, disposition, and verified correction if accepted.
+- Show the evidence and disposition for one selected finding, and verification
+  results for any correction made. If no actionable issues were found, record
+  one suggested verification check and its result.
 - Explain what you reviewed and what you did not verify.
-- Identify relevant WCAG 2.1 guidance and selected 2.2 AA checks, not a full audit.
+- Identify relevant WCAG 2.1 AA guidance and distinguish observed behavior,
+  source inference, and unperformed manual checks, not a full audit.
 - Make no blanket security or accessibility-conformance claim.
 
 ## 5. Retrospective
