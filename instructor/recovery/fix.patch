@@ -1,0 +1,12 @@
+diff --git a/client/src/findings.ts b/client/src/findings.ts
+--- a/client/src/findings.ts
++++ b/client/src/findings.ts
+@@ -48,7 +48,6 @@
+ 
+ function normalizeFacilityName(value: string): string {
+-  // Module 2: this check still accepts whitespace-only names.
+-  if (value.length === 0) throw new FacilityNameError();
++  if (value.trim().length === 0) throw new FacilityNameError();
+   return value.trim();
+ }
+ 

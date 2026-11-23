@@ -1,0 +1,23 @@
+diff --git a/client/src/findings.test.ts b/client/src/findings.test.ts
+--- a/client/src/findings.test.ts
++++ b/client/src/findings.test.ts
+@@ -52,6 +52,19 @@
+     expect(localStorage.getItem(STORAGE_KEY)).toBe(before);
+   });
+ 
++  it.each([false, true])("rejects whitespace-only facility before storage access (initialized: %s)", async (initialized) => {
++    if (initialized) await getFindings();
++    const before = localStorage.getItem(STORAGE_KEY);
++    const read = vi.spyOn(Storage.prototype, "getItem");
++    const write = vi.spyOn(Storage.prototype, "setItem");
++    await expect(createFinding({ ...payload, facility_name: "   " })).rejects.toBeInstanceOf(FacilityNameError);
++    expect(read).not.toHaveBeenCalled();
++    expect(write).not.toHaveBeenCalled();
++    read.mockRestore();
++    write.mockRestore();
++    expect(localStorage.getItem(STORAGE_KEY)).toBe(before);
++  });
++
+   it.each([null, undefined, 42])("preserves runtime rejection of a non-string facility: %s", async (facility_name) => {
+     // @ts-expect-error Exercise invalid runtime input from an untyped caller.
+     await expect(createFinding({ ...payload, facility_name })).rejects.toThrow("A finding requires");
